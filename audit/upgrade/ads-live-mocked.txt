@@ -1,0 +1,5 @@
+
+> test:ads
+> node tests/ads-browser.mjs
+
+PASS: ad mode=live, blocked=false; no unconsented Google request; reserved footer, unchanged body theme, zero game-page ads, no page errors. Live script was locally mocked.
