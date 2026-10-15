@@ -4,7 +4,16 @@
 
 **Start with [HANDOVER.md](HANDOVER.md)** for architecture, exact environment values, SQL setup/upgrades, provider connection strings, AdSense/CMP, room lifecycle, seven-day inactivity flags, testing and Vercel/Render deployment. **[PUBLISHING.md](PUBLISHING.md)** covers the clean ZIP, review/commit/push and rollback.
 
-## This upgrade
+## Latest small revision
+
+**[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** clearly explains host controls, first-admin setup, advertising and player moderation.
+
+- Optional room password checkbox, server-checked passwords, host password changes and kick controls in all six online games. Kicked players can rejoin as selected; old capabilities are revoked.
+- Admin dashboard: persisted ad-placement toggles, configured/effective mode, searchable accounts/activity flags, per-game scores and recent guest/account submissions.
+- **If already on the previous upgraded release, run `sql/upgrade-room-access.sql` BEFORE deploying.** Existing rooms remain open until hosts enable a password.
+- New `test:access` (8 scenarios) and `test:access-browser` (six games + admin). Previous full regression suites rerun. Full usage/limits in ADMIN_GUIDE.
+
+## Retained earlier upgrade
 
 - Fixes online Memory's invisible second card with server-validated flips and a shared 1800ms reveal phase.
 - Server-validates all five generic online games; serialized commands, stale-version rejection, canonical results/scores, race challenge/deadline checks. Crazy Eights retains private hands/server rules.
@@ -47,8 +56,8 @@ npm audit --omit=dev
 
 ## Verified scope / limits
 
-Build/lint/types, 8 unit tests, 4 baseline API tests, 4 retention tests, 6 expanded multiplayer tests, 26-route suite, playable paths across all 19 games and complete two-browser generic rounds passed. Full Crazy Eights API game verifies card conservation. Evidence: `audit/upgrade/`; scope/limits: HANDOVER §8.
+Build/lint/types, 9 unit tests, 4 baseline API tests, 4 retention tests, 6 expanded multiplayer tests, 8 room-access/admin scenarios, 26-route suite, playable paths across all 19 games and complete two-browser generic rounds passed. Full Crazy Eights API game verifies card conservation. Evidence: `audit/upgrade/`; scope/limits: HANDOVER §8.
 
 Runtime audit: zero vulnerabilities at snapshot; five high development-only ESLint-chain advisories remain. Public solo scores remain client-submitted; visible Memory patterns/Math answers and client CPU strategy mean **not anti-cheat**. Polling is not a zero-lag guarantee. No real cloud deployment, CMP certification, AdSense approval, mobile/gamepad hardware certification or long-term soak is claimed. Live external ad creatives can have color; off/placeholder keeps strict monochrome.
 
-New archive: **TTYARCADE-upgraded.zip**. The previous TTYARCADE-final.zip is an older release.
+New archive: **TTYARCADE-room-controls.zip**. The previous TTYARCADE-final.zip is an older release.

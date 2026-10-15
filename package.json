@@ -15,7 +15,9 @@
     "test:retention-browser": "node tests/retention-browser.mjs",
     "test:multiplayer-browser": "node tests/multiplayer-browser.mjs",
     "test:multiplayer-api": "node --test tests/multiplayer-api.mjs",
-    "test:all-games-browser": "tsx tests/all-games-browser.mjs"
+    "test:all-games-browser": "tsx tests/all-games-browser.mjs",
+    "test:access": "node --test tests/access.test.mjs",
+    "test:access-browser": "node tests/access-browser.mjs"
   },
   "dependencies": {
     "dotenv": "17.3.1",

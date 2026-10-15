@@ -1,6 +1,12 @@
 # TTYARCADE — upgraded developer handover
 
-**15 October 2026 · Tested deployment candidate, not a hosted deployment.** Built on the previous audited release, compared against `Sakthivelan-B/TTYARCADE` main commit `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Nothing was pushed to GitHub or deployed to a cloud account. The new archive is **TTYARCADE-upgraded.zip**; the earlier `TTYARCADE-final.zip` is not this release.
+**15 October 2026 · Tested deployment candidate, not a hosted deployment.** Built on the previous audited release, compared against `Sakthivelan-B/TTYARCADE` main commit `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Nothing was pushed to GitHub or deployed to a cloud account. The new archive is **TTYARCADE-room-controls.zip**; the earlier `TTYARCADE-final.zip` is not this release.
+
+## Room-access / admin revision (latest)
+
+Read **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** for step-by-step host password/kick controls, first-admin SQL setup, ad switches and player moderation. On an installation already running the previous upgraded ZIP, run **`sql/upgrade-room-access.sql` before deployment**. New room passwords are salted scrypt hashes; old rooms remain open by default. Hosts can enable/change/disable passwords and kick another human; selected policy allows rejoining with the current password. Valid existing seats still refresh without retyping it. Passwords govern joining, not confidentiality of public room snapshots.
+
+The admin UI now exposes persisted placement switches, effective/configured ad modes, searchable accounts, activity/inactive timestamps, per-game scores and latest 100 account/guest score submissions. Environment IDs/mode, real CMP/site approval, Google reporting and consent remain owner/provider responsibilities. Deprecated ADMIN_USERNAMES guidance was removed from the UI. New verification in `audit/access/`: **8 API scenarios**, six-game password/kick/rejoin browsers, admin UI/backend authorization/persistence, fresh/previous-release/repeated SQL. Previous all-19/playthrough/retention suites rerun successfully. Below documents the retained architecture; ADMIN_GUIDE supplies latest operational details.
 
 ## 1. Architecture and preserved design
 
@@ -67,11 +73,12 @@ A root `.env` is read by Next and `drizzle.config.ts`, **not automatically sourc
 | Empty/new | `sql/schema.sql` — complete bootstrap, once. Not repeat-safe; don't run against initialized tables. |
 | Original seven-table repository, before audited logging/security additions | `sql/existing-database.sql` — one-time original-schema upgrade including the new fields. Not the previous-audit upgrade. |
 | Previous audited release (already has game_logs/reporting/RLS) | **`sql/upgrade-retention-ads.sql`** — additive, repeat-safe; includes activity flags, departure tracking, card host position, placements and room version. |
-| Already applied retention/ads upgrade before multiplayer rules were added | `sql/upgrade-multiplayer-rules.sql` — repeat-safe `rooms.version` addition only. Not sufficient for a pre-retention database. |
+| Previous upgraded release, already has retention/ads and room version | **`sql/upgrade-room-access.sql`** — repeat-safe room-password columns for this revision. |
+| Already applied retention/ads upgrade before multiplayer rules were added | `sql/upgrade-multiplayer-rules.sql` — repeat-safe `rooms.version` addition only; then run `upgrade-room-access.sql`. Not sufficient for a pre-retention database. |
 
 Do not run bootstrap and original-schema upgrade sequentially. Do not use `drizzle-kit push` as a substitute for the supplied triggers/functions/RLS SQL. For any other schema, inspect differences manually.
 
-Main objects: `users`, `sessions`, `game_scores`, `rooms`, `room_players`, `card_rooms`, `card_players`, `game_logs`, `player_high_scores`, `ad_placements`. Added fields: `users.last_active_at/inactive_at`, both player tables' `left_at`, `card_rooms.host_position`, `rooms.version`. Score logging and account activity triggers are included. Scores/history are not backfilled into play logs; logs record accepted score inserts, not all moves. Guest names are not unique identities.
+Main objects: `users`, `sessions`, `game_scores`, `rooms`, `room_players`, `card_rooms`, `card_players`, `game_logs`, `player_high_scores`, `ad_placements`. Added fields: `users.last_active_at/inactive_at`, both player tables' `left_at`, `card_rooms.host_position`, `rooms.version`, plus nullable `rooms.password_hash` / `card_rooms.password_hash`. Score logging and account activity triggers are included. Scores/history are not backfilled into play logs; logs record accepted score inserts, not all moves. Guest names are not unique identities.
 
 ## 4. Refresh, disconnect, explicit leave and room ownership
 
@@ -194,11 +201,12 @@ Netlify requires a compatible Next/OpenNext runtime/adapter, not a static site e
 
 ## 8. Verification, evidence and honest limits
 
-Latest production build was restarted before the final gameplay regression run. Evidence in `audit/upgrade/`:
+Latest production build was restarted before the final gameplay regression run. Latest evidence in `audit/access/`; `audit/upgrade/` retains the preceding upgrade evidence:
 
 - ESLint, TypeScript and production build: PASS.
-- Unit: **8/8** (2048, bounded Snake, storage/controls, card encoding/tokens, ads, Memory lifecycle, board rules, race challenges).
+- Unit: **9/9** (2048, bounded Snake, storage/controls, card encoding/tokens, ads, Memory lifecycle, board rules, race challenges, salted room-password rules).
 - Baseline API: **4/4**; retention/API upgrade: **4/4**; expanded multiplayer API: **6/6**, including concurrent/stale moves, state/score forgery rejection, race timeouts, full Crazy Eights game/104-card conservation, late-join slots, administrative host handover.
+- Room access/admin API: **8/8**, six-game password/kick/rejoin browser checks and authenticated admin UI/placement persistence: PASS.
 - Two-browser complete gameplay for all five generic games: Memory both cards visible on both peers, mismatch/turn change, refresh with first card open, matching extra turns, final totals/rematch; board wins/rematches; complete Math/Typing races and peer input clearing. Zero page errors.
 - Playable-path checks across **all 19 games**, including solved generated matrix/maze/slide/lights puzzles, solo progression, initial Minesweeper reveal/flags, local board wins. Not exhaustive every-level simulation.
 - **26-route** browser suite, internal links/theme/device-control smoke; six-game retention/refresh/leave/close suite: PASS.
