@@ -1,117 +1,104 @@
-# Publishing TTYARCADE
+# Publish the TTYARCADE upgrade
 
-Full configuration, provider-dashboard instructions, SQL setup, host-specific deployment and known limitations: [HANDOVER.md](HANDOVER.md).
+New release: **TTYARCADE-upgraded.zip** (not the previous TTYARCADE-final.zip). Complete architecture, exact environment/provider URI instructions, SQL choice, AdSense/CMP, refresh/leave behavior, seven-day flags, Vercel/Render deployment and limits: **[HANDOVER.md](HANDOVER.md)**.
 
-## 1. Apply the audited ZIP to a fresh clone
+## 1. Review against current GitHub before applying
 
-Requires Git and Node 22 LTS. Authenticate with your GitHub account (SSH key, credential manager or a personal access token when Git prompts). Never put a token into a remote URL.
+Compared public main at `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Upstream may have changed since this audit. Authenticate with an authorized GitHub account using a credential manager or SSH; do not embed a token in a URL.
 
 ```bash
 git clone https://github.com/Sakthivelan-B/TTYARCADE.git
 cd TTYARCADE
-git switch -c audit/terminal-hardening
-# Extract TTYARCADE-final.zip OUTSIDE this clone first.
-# Its top-level folder is TTYARCADE/. Copy that folder's CONTENTS into this
-# clone, including .gitignore, .env.example and .nvmrc. Preserve clone/.git.
+git fetch origin
+git switch -c upgrade/retention-ads-gameplay
+git log -1 --oneline
 ```
 
-Unix/macOS example (adjust your actual download location):
+Extract the ZIP **outside** the clone; its top-level directory is `TTYARCADE/`. Preserve clone `.git` and any private environment files. An overlay does not remove obsolete tracked files:
 
 ```bash
-unzip ~/Downloads/TTYARCADE-final.zip -d ../audited-release
-rsync -av --exclude='.git' ../audited-release/TTYARCADE/ ./
-# The audited release replaces this old config; an overlay cannot delete it:
+unzip ~/Downloads/TTYARCADE-upgraded.zip -d ../ttyarcade-release
+rsync -av --exclude='.git' --exclude='.env' ../ttyarcade-release/TTYARCADE/ ./
 git rm --ignore-unmatch drizzle.config.json
 ```
 
-On Windows, enable hidden-file visibility and copy the extracted folder's contents into the clone without replacing `.git`. Delete old `drizzle.config.json` if it exists. You can also apply the supplied patch to a clone of exactly the recorded upstream commit using `git apply --check ../TTYARCADE-audit.patch` then `git apply ../TTYARCADE-audit.patch` instead of an overlay.
+On Windows extract/copy all contents, including `.gitignore`, `.env.example`, `.nvmrc`, preserving `.git`; remove obsolete `drizzle.config.json` if present. If remote has newer work, merge selectively, not a blind overwrite. The optional `TTYARCADE-upgrade.patch` is relative to the comparison commit; use `git apply --check` first on a clean checkout of that base. Do not apply the patch on top of the ZIP overlay.
 
-If you are using a working clone with local changes, first commit or stash them and fetch the upstream branch. Do not overwrite uncommitted work. Review compatibility if upstream has moved beyond `audit/upstream-commit.txt`.
+## 2. Initialize or migrate DB BEFORE running new code
 
-## 2. Set up and validate
+Back up and test on an isolated branch/restore. Choose exactly one initial route from HANDOVER §3:
+
+- Empty database: `sql/schema.sql` once.
+- Original seven-table schema: `sql/existing-database.sql` once.
+- Previous audited database: **`sql/upgrade-retention-ads.sql`** (repeat-safe, includes version).
+- Already on the retention/ads upgrade but missing room version: `sql/upgrade-multiplayer-rules.sql`.
+
+Run with SQL Editor as owner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/FILE.sql`, replacing FILE. Root `.env` is not automatically sourced by psql. Never run fresh schema on an initialized production DB. Preserve backups; scripts are not downgrades.
+
+## 3. Verify and publish branch
 
 ```bash
 nvm install
 nvm use
 npm ci
 cp .env.example .env
-# Edit .env: real disposable DATABASE_URL + generated CRON_SECRET.
-# Initialize that database with sql/schema.sql (new) OR
-# sql/existing-database.sql (original existing seven-table schema).
-# See HANDOVER.md for provider SQL Editor and psql instructions.
+# Fill local disposable DATABASE_URL and CRON_SECRET; leave ads off.
 npm run lint
 npm run typecheck
 npm run test:unit
 npm run build
-npm audit --omit=dev
-npx playwright install --with-deps chromium
-```
-
-In terminal 1, start the production build against your disposable test DB:
-
-```bash
-npm run start
-```
-
-In terminal 2:
-
-```bash
+# In a separate terminal: npm run start
 npm test
+npx playwright install --with-deps chromium
 npm run test:browser
+npm run test:all-games-browser
+npm run test:retention-browser
+npm run test:multiplayer-browser
+# Securely export test-only ALLOW_DATABASE_TESTS=1, TEST_DATABASE_URL,
+# TEST_CRON_SECRET matching that isolated server, then:
+npm run test:upgrade
+npm run test:multiplayer-api
+npm audit --omit=dev
 ```
 
-Do not run mutation tests against production. Five known high **development-only** audit findings are documented in HANDOVER.md; full `npm audit` is expected to flag them until upstream has a safe patched release. Do not use `npm audit fix --force` to downgrade Next's ESLint configuration.
-
-## 3. Review and push
+Then review **new files as well as tracked diffs**:
 
 ```bash
 git status --short
-git diff --stat
 git diff --check
 git diff
-# .env must be ignored; this should print the .gitignore rule:
-git check-ignore .env
-# Stage the audited files (not .env or node_modules):
 git add -A
 git diff --cached --stat
-git diff --cached --check
-# Inspect newly added files too: git diff alone omits untracked files.
 git diff --cached
-# Stop if you see a real password, connection URI, token or .env.
-git commit -m "Audit games, harden room APIs, enforce terminal theme and add SQL handover"
+# STOP if you see a real .env, password, token, DB dump or credentials.
+git commit -m "Preserve rooms, flag inactive accounts, add optional ads and validate multiplayer rules"
 git remote -v
-# Ensure origin is https://github.com/Sakthivelan-B/TTYARCADE.git
-# (or your authorized SSH equivalent), then:
-git push -u origin audit/terminal-hardening
+# Confirm origin is the intended repository, then:
+git push -u origin upgrade/retention-ads-gameplay
 ```
 
-Open the branch's pull request in GitHub, inspect all changes, pass checks and merge into the repository's actual default branch. Do not assume it is `main`; check the repository first. Do not force-push or overwrite remote work. If your account lacks write permission, push a fork and open a PR to the original repository.
+Open a pull request, review/resolve newer remote changes, pass checks and merge into the repository's actual default branch. Do not force-push. If you lack write access, push a fork and open a PR. This agent has not pushed anything.
 
-After merge:
+## 4. Deploy and accept
 
-```bash
-git fetch origin
-# Replace ACTUAL_DEFAULT_BRANCH with the branch reported by GitHub.
-git switch ACTUAL_DEFAULT_BRANCH
-git pull --ff-only origin ACTUAL_DEFAULT_BRANCH
-```
-
-The branch placeholder is deliberate: substitute the actual name, not the literal placeholder. This audit did not push anything to GitHub.
-
-## 4. Deploy
-
-Initialize/back up the production database separately. Configure **DATABASE_URL** and **CRON_SECRET** in the host dashboard, not Git.
-
-| Host | Build | Start / runtime |
+| Host | Build | Runtime |
 |---|---|---|
-| Vercel | `npm run build` (install `npm ci`) | Next.js preset, Node 22.x, default framework output |
-| Render | `npm ci && npm run build` | `npm run start -- --hostname 0.0.0.0 --port $PORT` |
-| Netlify | `npm run build` | Supported Next.js/OpenNext adapter, Node 22.x; not static export |
+| Vercel | Next.js preset, Node 22.x, `npm ci`, `npm run build` | Framework default, no static export |
+| Render Web Service | Node 22, `npm ci && npm run build` | `npm run start -- --hostname 0.0.0.0 --port $PORT` |
 
-See HANDOVER.md §5 for complete dashboard steps and compatibility caveats. Connect the production branch, deploy, test `/api/health`, sign in, promote your admin in SQL and verify one solo score plus a two-browser room. Configure the authorized daily cleanup scheduler. Enable HTTPS before using account cookies.
+Configure server **DATABASE_URL**, **CRON_SECRET** and optional public ads env in the hosting dashboard. Use separate preview/production DBs. Rebuild after public env changes. See HANDOVER §7 for full steps; no cloud deployment was exercised here.
 
-## 5. Clean ZIP contents and rollback
+Owner acceptance after HTTPS deployment:
 
-The archive contains source, configuration, lockfile, SQL scripts, docs, tests and audit evidence. It intentionally excludes `.git`, `.env`, credentials, node_modules, `.next`, database contents, installed browser files and caches. `npm ci` and `npm run build` recreate dependencies/output after extraction.
+- `/api/health` is 200; guest can play without login.
+- Two separate browsers create/join/start; Memory shows **both** cards before mismatch resolution.
+- Refresh/offline tabs retain room/seat/hand; explicit leave transfers host; host close/last explicit leave deletes room.
+- Optional login, score attribution and SQL-promoted administrator work.
+- Daily authenticated cron flags old accounts, deletes expired sessions, **deletes no rooms/users/scores/logs**. Vercel schedule is 04:00 UTC; Render requires its own scheduled call.
+- Ads stay off unless deliberately configured. If enabling live, finish real CMP/site approval/privacy/ads.txt first, disable Auto ads, verify consent before network loading. Live Google creatives cannot be guaranteed monochrome.
 
-Rollback code by reverting the merged commit or selecting the previous deployment. Back up before database work; SQL bootstraps are not rollback scripts. Never use reset/force-push as the default release recovery strategy.
+## 5. Rollback and clean archive
+
+Select previous provider deployment or `git revert` the reviewed merge commit. Do not blindly revert/overwrite schema; retain tested additive columns or use an owner-reviewed migration/backup restore. Never use bootstrap SQL for rollback.
+
+ZIP includes source, lockfile, docs, SQL, regression tests and audit evidence. It excludes `.git`, `.env`, dependencies, `.next`, database/browser data and caches. The accompanying SHA-256 file detects archive corruption, not malicious provenance. See HANDOVER §8 for remaining trust-based score, rate-limit, storage and test-coverage limitations.

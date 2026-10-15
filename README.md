@@ -1,30 +1,31 @@
-# ttyarcade
+# TTYARCADE
 
-A browser arcade with 19 text-only games, strict black-and-white monospace terminal styling, solo/local/CPU modes, online rooms, optional accounts and PostgreSQL score history.
+19 text/ASCII browser games in a fixed black/white CRT terminal. Next.js + React + PostgreSQL. Guests play immediately; accounts are optional.
 
-## Start here
+**Start with [HANDOVER.md](HANDOVER.md)** for architecture, exact environment values, SQL setup/upgrades, provider connection strings, AdSense/CMP, room lifecycle, seven-day inactivity flags, testing and Vercel/Render deployment. **[PUBLISHING.md](PUBLISHING.md)** covers the clean ZIP, review/commit/push and rollback.
 
-- **[HANDOVER.md](HANDOVER.md)** — architecture, exact environment variables, Supabase/Neon SQL setup, Vercel/Render/Netlify deployment, detailed fixes and remaining risks.
-- **[PUBLISHING.md](PUBLISHING.md)** — ZIP application, validation, commit/push and release steps.
-- **[sql/schema.sql](sql/schema.sql)** — run once in a **fresh** PostgreSQL database.
-- **[sql/existing-database.sql](sql/existing-database.sql)** — additive upgrade for the original seven-table database, after backup. Do not run both scripts.
-- **[audit/FILE_REVIEW.md](audit/FILE_REVIEW.md)** — reviewed-file inventory and validation evidence.
+## This upgrade
 
-## Local development
+- Fixes online Memory's invisible second card with server-validated flips and a shared 1800ms reveal phase.
+- Server-validates all five generic online games; serialized commands, stale-version rejection, canonical results/scores, race challenge/deadline checks. Crazy Eights retains private hands/server rules.
+- Rooms persist through refresh, offline tabs and inactivity. Delete only on last human's explicit leave or host close; offline human seats are reserved, not auto-converted to CPUs.
+- Seven-day inactivity is a **reversible account flag**, not deletion or significant storage reclamation.
+- Optional env-configured footer-only advertising: default off, monochrome no-network placeholder, consent-gated live AdSense bridge with DB kill switches. No game-page ads or visual theme changes.
+- Repairs race input/timers, Minesweeper's initial grid, Lights Out reset and other gameplay edges. Retains previous Snake/2048/CPU/security fixes.
 
-Node 22 LTS recommended; PostgreSQL 14+ required for server features.
+## Local setup
+
+Node 22 LTS recommended, PostgreSQL 14+ for server features.
 
 ```bash
 npm ci
 cp .env.example .env
-# Fill DATABASE_URL and CRON_SECRET; initialize database using the SQL Editor
-# and sql/schema.sql as described in HANDOVER.md.
+# Fill DATABASE_URL and generated CRON_SECRET; ads default off.
+# Run the correct SQL script BEFORE starting (HANDOVER §3).
 npm run dev
 ```
 
-Open http://localhost:3000. No external image, icon, font or canvas dependency is used. Saved light themes no longer change the terminal background. Input supports arrows/WASD, remapped keys, text buttons and gamepads.
-
-## Commands
+Open http://localhost:3000. New DB: `sql/schema.sql`. **Previous audited DB: `sql/upgrade-retention-ads.sql`**. Other starting schemas have separate paths; don't run bootstrap against an existing DB. Never commit `.env`.
 
 ```bash
 npm run lint
@@ -32,15 +33,22 @@ npm run typecheck
 npm run test:unit
 npm run build
 npm run start
-# With a running server and disposable initialized PostgreSQL DB:
+# Running isolated server/database + installed Playwright Chromium:
 npm test
-npx playwright install --with-deps chromium
 npm run test:browser
+npm run test:all-games-browser
+npm run test:retention-browser
+npm run test:multiplayer-browser
+# Requires explicit disposable DB opt-in, detailed in HANDOVER:
+npm run test:upgrade
+npm run test:multiplayer-api
 npm audit --omit=dev
 ```
 
-## Release notes
+## Verified scope / limits
 
-Fixed verified Snake high-level freezes, Crazy Eights deck disclosure/unauthorized start/racing actions, generic-room host and turn controls, 2048 hydration errors, stuck network busy states, unsafe administrator bootstrap and theme switching. Included SQL score logs, environment examples, lockfile and repeatable regression tests.
+Build/lint/types, 8 unit tests, 4 baseline API tests, 4 retention tests, 6 expanded multiplayer tests, 26-route suite, playable paths across all 19 games and complete two-browser generic rounds passed. Full Crazy Eights API game verifies card conservation. Evidence: `audit/upgrade/`; scope/limits: HANDOVER §8.
 
-**Important limitations:** generic gameplay and leaderboard scores remain client-authoritative; this is a friendly arcade, not an anti-cheat service. Five high development-only ESLint dependency-chain advisories remain documented. Production dependency audit was clean at the audit snapshot. Full multiplayer/soak testing and cloud deployment remain owner acceptance tasks. No live domain, GitHub push, or deployment is claimed.
+Runtime audit: zero vulnerabilities at snapshot; five high development-only ESLint-chain advisories remain. Public solo scores remain client-submitted; visible Memory patterns/Math answers and client CPU strategy mean **not anti-cheat**. Polling is not a zero-lag guarantee. No real cloud deployment, CMP certification, AdSense approval, mobile/gamepad hardware certification or long-term soak is claimed. Live external ad creatives can have color; off/placeholder keeps strict monochrome.
+
+New archive: **TTYARCADE-upgraded.zip**. The previous TTYARCADE-final.zip is an older release.

@@ -9,7 +9,13 @@
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/api.test.mjs",
     "test:browser": "node tests/browser.mjs",
-    "test:unit": "tsx --test tests/unit.test.ts"
+    "test:unit": "tsx --test tests/unit.test.ts",
+    "test:upgrade": "node --test tests/upgrade.test.mjs",
+    "test:ads": "node tests/ads-browser.mjs",
+    "test:retention-browser": "node tests/retention-browser.mjs",
+    "test:multiplayer-browser": "node tests/multiplayer-browser.mjs",
+    "test:multiplayer-api": "node --test tests/multiplayer-api.mjs",
+    "test:all-games-browser": "tsx tests/all-games-browser.mjs"
   },
   "dependencies": {
     "dotenv": "17.3.1",
