@@ -1,0 +1,5 @@
+
+> test:retention-browser
+> node tests/retention-browser.mjs
+
+PASS: all five generic games auto-resume playing state; Crazy Eights refresh + explicit last leave; failed leave retains token; host close; persisted controls; gamepad permission denial fallback; zero page errors.

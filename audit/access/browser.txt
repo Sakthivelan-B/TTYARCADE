@@ -1,0 +1,11 @@
+
+> test:access-browser
+> node tests/access-browser.mjs
+
+PASS tictactoe: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS connect4: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS memory: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS math: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS typing: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS crazy8: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS admin: nonadmin rejection, authorized dashboard, persistent ad toggles, searchable account activity and self-protection; zero page errors.

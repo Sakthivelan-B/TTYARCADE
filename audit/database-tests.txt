@@ -1,0 +1,13 @@
+ code  | total_cards
+-------+-------------
+ LJ37K |         104
+ LN66Y |         104
+(2 rows)
+
+BEGIN
+INSERT 0 1
+INSERT 0 1
+DO
+DELETE 1
+DO
+ROLLBACK
