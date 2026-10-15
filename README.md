@@ -1,50 +1,46 @@
 # ttyarcade
 
-**Planned address:** https://ttyarcade.vercel.app (free), with `ttyarcade.com` as the custom domain once you register it (see PUBLISHING.md §0.5).
+A browser arcade with 19 text-only games, strict black-and-white monospace terminal styling, solo/local/CPU modes, online rooms, optional accounts and PostgreSQL score history.
 
-A text-only, black-and-white game website that looks like a Linux terminal.
-No images, no colors, instant load.
+## Start here
 
-- **19 games:** Crazy Eights (online, 2-10 players), 13 endless level games
-  whose levels are newly generated every time, and the classics XoX, Connect Four, 2048 and Pong.
-- **Play modes:** solo, same device (2-10 players), vs CPU, or online rooms with a 5-letter code.
-  If nobody joins within about 9 seconds, a random-named CPU player fills the seat.
-  A human who joins later takes that seat over.
-- **Optional accounts** with saved score tracking, plus an **admin panel** to block, unblock or delete users.
-- **Settings:** dark / medium / light theme, remappable keys, and joystick (gamepad) support.
+- **[HANDOVER.md](HANDOVER.md)** — architecture, exact environment variables, Supabase/Neon SQL setup, Vercel/Render/Netlify deployment, detailed fixes and remaining risks.
+- **[PUBLISHING.md](PUBLISHING.md)** — ZIP application, validation, commit/push and release steps.
+- **[sql/schema.sql](sql/schema.sql)** — run once in a **fresh** PostgreSQL database.
+- **[sql/existing-database.sql](sql/existing-database.sql)** — additive upgrade for the original seven-table database, after backup. Do not run both scripts.
+- **[audit/FILE_REVIEW.md](audit/FILE_REVIEW.md)** — reviewed-file inventory and validation evidence.
 
-## Quick start (local)
+## Local development
 
-Requirements: **Node.js 20.9+** and **PostgreSQL 14+**. Use a local install, Docker, or a free Neon database.
+Node 22 LTS recommended; PostgreSQL 14+ required for server features.
 
 ```bash
-npm install
-cp .env.example .env            # then put your DATABASE_URL in .env
-npx drizzle-kit push --dialect=postgresql --schema=./src/db/schema.ts --url="$DATABASE_URL"
-npm run dev                     # http://localhost:3000
+npm ci
+cp .env.example .env
+# Fill DATABASE_URL and CRON_SECRET; initialize database using the SQL Editor
+# and sql/schema.sql as described in HANDOVER.md.
+npm run dev
 ```
 
-The PostgreSQL database must already exist. A one-line Docker database for local development:
+Open http://localhost:3000. No external image, icon, font or canvas dependency is used. Saved light themes no longer change the terminal background. Input supports arrows/WASD, remapped keys, text buttons and gamepads.
+
+## Commands
 
 ```bash
-docker run -d --name ttyarcade-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=app_db -p 5432:5432 postgres:16
-# DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:5432/app_db
+npm run lint
+npm run typecheck
+npm run test:unit
+npm run build
+npm run start
+# With a running server and disposable initialized PostgreSQL DB:
+npm test
+npx playwright install --with-deps chromium
+npm run test:browser
+npm audit --omit=dev
 ```
 
-## Documentation
+## Release notes
 
-| File | What it is for |
-|---|---|
-| [`PUBLISHING.md`](./PUBLISHING.md) | Step-by-step free deployment (GitHub + Neon + Vercel): every environment variable and where to get it |
-| [`HANDOVER.md`](./HANDOVER.md) | Full technical handover for the next developer or AI agent: architecture, rules, file map, APIs |
-| [`.env.example`](./.env.example) | All environment variables, with explanations |
+Fixed verified Snake high-level freezes, Crazy Eights deck disclosure/unauthorized start/racing actions, generic-room host and turn controls, 2048 hydration errors, stuck network busy states, unsafe administrator bootstrap and theme switching. Included SQL score logs, environment examples, lockfile and repeatable regression tests.
 
-## Scripts
-
-```bash
-npm run dev        # development server
-npm run build      # production build
-npm run start      # run the production build
-npm run lint       # eslint
-npx tsc --noEmit   # typecheck
-```
+**Important limitations:** generic gameplay and leaderboard scores remain client-authoritative; this is a friendly arcade, not an anti-cheat service. Five high development-only ESLint dependency-chain advisories remain documented. Production dependency audit was clean at the audit snapshot. Full multiplayer/soak testing and cloud deployment remain owner acceptance tasks. No live domain, GitHub push, or deployment is claimed.
