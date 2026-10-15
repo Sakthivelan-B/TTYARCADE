@@ -1,5 +1,0 @@
-
-> test:browser
-> node tests/browser.mjs
-
-PASS: 26 routes, internal links, strict terminal colors, text-only DOM, saved-light override, game input, local/online CPU and navigation smoke tests; no browser page errors.
