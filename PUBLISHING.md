@@ -1,8 +1,10 @@
 # Publish the TTYARCADE upgrade
 
-New release: **TTYARCADE-room-controls.zip** (not the previous TTYARCADE-final.zip). Complete architecture, exact environment/provider URI instructions, SQL choice, AdSense/CMP, refresh/leave behavior, seven-day flags, Vercel/Render deployment and limits: **[HANDOVER.md](HANDOVER.md)**.
+New release: **TTYARCADE-tabs-update.zip** (not the previous TTYARCADE-final.zip). Complete architecture, exact environment/provider URI instructions, SQL choice, AdSense/CMP, refresh/leave behavior, seven-day flags, Vercel/Render deployment and limits: **[HANDOVER.md](HANDOVER.md)**.
 
-**Already running the previous upgraded ZIP?** Back up and run `sql/upgrade-room-access.sql` first. See **ADMIN_GUIDE.md** for room access, admin setup and ads/player management. This full archive includes the earlier upgrades as well.
+**Already running TTYARCADE-room-controls.zip? No SQL migration for this home/single-tab update.** The archive removes the home waiting-room list and locally returns older game tabs home when a newer game tab opens. It does not delete rooms or log out accounts.
+
+**Still running the earlier upgraded ZIP, before room controls?** Back up and run `sql/upgrade-room-access.sql` first. See **ADMIN_GUIDE.md** for room access, admin setup and ads/player management. This full archive includes the earlier upgrades as well.
 
 ## 1. Review against current GitHub before applying
 
@@ -12,24 +14,25 @@ Compared public main at `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Upstream may
 git clone https://github.com/Sakthivelan-B/TTYARCADE.git
 cd TTYARCADE
 git fetch origin
-git switch -c upgrade/room-access-admin
+git switch -c upgrade/home-single-tab
 git log -1 --oneline
 ```
 
 Extract the ZIP **outside** the clone; its top-level directory is `TTYARCADE/`. Preserve clone `.git` and any private environment files. An overlay does not remove obsolete tracked files:
 
 ```bash
-unzip ~/Downloads/TTYARCADE-room-controls.zip -d ../ttyarcade-release
+unzip ~/Downloads/TTYARCADE-tabs-update.zip -d ../ttyarcade-release
 rsync -av --exclude='.git' --exclude='.env' ../ttyarcade-release/TTYARCADE/ ./
 git rm --ignore-unmatch drizzle.config.json
 ```
 
-On Windows extract/copy all contents, including `.gitignore`, `.env.example`, `.nvmrc`, preserving `.git`; remove obsolete `drizzle.config.json` if present. If remote has newer work, merge selectively, not a blind overwrite. The optional `TTYARCADE-room-controls.patch` is relative to the previous delivered TTYARCADE-upgraded.zip, SHA-256 `dc63e82d5009a0ceaa8fbe529408b07651716dbb7b1f4888b0ba134359670c0b`; it is not a cumulative patch against original main. Use `git apply --check` first on that exact extracted baseline. Do not apply the patch on top of the ZIP overlay.
+On Windows extract/copy all contents, including `.gitignore`, `.env.example`, `.nvmrc`, preserving `.git`; remove obsolete `drizzle.config.json` if present. If remote has newer work, merge selectively, not a blind overwrite. The optional `TTYARCADE-tabs-update.patch` is relative to the previous delivered TTYARCADE-room-controls.zip, SHA-256 `23538b2c9530970733e92a338759f0fb035ff4dba170195d47447c5197453715`; it is not a cumulative patch against original main. Use `git apply --check` first on that exact extracted baseline. Do not apply the patch on top of the ZIP overlay.
 
 ## 2. Initialize or migrate DB BEFORE running new code
 
 Back up and test on an isolated branch/restore. Choose exactly one initial route from HANDOVER §3:
 
+- Previous room-controls database: no SQL needed for this tab/home revision.
 - Previous upgraded database with room version/ads/retention: **`sql/upgrade-room-access.sql`**.
 - Empty database: `sql/schema.sql` once.
 - Original seven-table schema: `sql/existing-database.sql` once.
@@ -63,6 +66,7 @@ npm run test:upgrade
 npm run test:multiplayer-api
 npm run test:access
 npm run test:access-browser
+npm run test:tabs-browser
 npm audit --omit=dev
 ```
 
@@ -79,7 +83,7 @@ git diff --cached
 git commit -m "Preserve rooms, flag inactive accounts, add optional ads and validate multiplayer rules"
 git remote -v
 # Confirm origin is the intended repository, then:
-git push -u origin upgrade/room-access-admin
+git push -u origin upgrade/home-single-tab
 ```
 
 Open a pull request, review/resolve newer remote changes, pass checks and merge into the repository's actual default branch. Do not force-push. If you lack write access, push a fork and open a PR. This agent has not pushed anything.

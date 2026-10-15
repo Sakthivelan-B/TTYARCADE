@@ -4,7 +4,15 @@
 
 **Start with [HANDOVER.md](HANDOVER.md)** for architecture, exact environment values, SQL setup/upgrades, provider connection strings, AdSense/CMP, room lifecycle, seven-day inactivity flags, testing and Vercel/Render deployment. **[PUBLISHING.md](PUBLISHING.md)** covers the clean ZIP, review/commit/push and rollback.
 
-## Latest small revision
+## Latest home / single-tab update
+
+- Removed the home-page `$ who | grep waiting` room list (it was live waiting rooms, not play history). Rooms themselves are not deleted.
+- Only one active game tab per browser profile/site: opening any game in a newer tab returns the older game tab to home with a brief notice. No server leave/close or account logout is sent; online seats/tokens stay recoverable. Separate browsers/profiles/devices remain independent.
+- Opening home/admin/settings/rules does not stop a game. Solo progress is not saved by this handoff. If both cross-tab browser APIs are blocked, coordination cannot be guaranteed.
+- **No new SQL migration when updating from TTYARCADE-room-controls.zip.** Earlier installations still need their documented schema upgrades.
+- Latest download: **TTYARCADE-tabs-update.zip**; new regression command: `npm run test:tabs-browser`. Full prior regressions also rerun; evidence: `audit/tabs/`.
+
+## Retained room / admin revision
 
 **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** clearly explains host controls, first-admin setup, advertising and player moderation.
 
@@ -60,4 +68,4 @@ Build/lint/types, 9 unit tests, 4 baseline API tests, 4 retention tests, 6 expan
 
 Runtime audit: zero vulnerabilities at snapshot; five high development-only ESLint-chain advisories remain. Public solo scores remain client-submitted; visible Memory patterns/Math answers and client CPU strategy mean **not anti-cheat**. Polling is not a zero-lag guarantee. No real cloud deployment, CMP certification, AdSense approval, mobile/gamepad hardware certification or long-term soak is claimed. Live external ad creatives can have color; off/placeholder keeps strict monochrome.
 
-New archive: **TTYARCADE-room-controls.zip**. The previous TTYARCADE-final.zip is an older release.
+New archive: **TTYARCADE-tabs-update.zip**. The previous TTYARCADE-final.zip is an older release.

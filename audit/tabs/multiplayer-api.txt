@@ -1,0 +1,44 @@
+
+> test:multiplayer-api
+> node --test tests/multiplayer-api.mjs
+
+TAP version 13
+# Subtest: memory serializes simultaneous flips, cannot hide the second card early, and rejects state/score forgery
+ok 1 - memory serializes simultaneous flips, cannot hide the second card early, and rejects state/score forgery
+  ---
+  duration_ms: 120.624345
+  ...
+# Subtest: both race games enforce challenge identity, deadline and one accepted concurrent answer
+ok 2 - both race games enforce challenge identity, deadline and one accepted concurrent answer
+  ---
+  duration_ms: 191.618823
+  ...
+# Subtest: board moves enforce symbol, one changed cell, gravity and stale versions
+ok 3 - board moves enforce symbol, one changed cell, gravity and stale versions
+  ---
+  duration_ms: 102.57032
+  ...
+# Subtest: Crazy Eights completes a full human-v-human game with validated hands, draws and wild suits
+ok 4 - Crazy Eights completes a full human-v-human game with validated hands, draws and wild suits
+  ---
+  duration_ms: 764.958483
+  ...
+# Subtest: late arrivals cannot create nonexistent race/memory slots; explicit leave preserves active turn
+ok 5 - late arrivals cannot create nonexistent race/memory slots; explicit leave preserves active turn
+  ---
+  duration_ms: 128.844585
+  ...
+# Subtest: moderating an active host transfers control and revokes old capabilities in both room engines
+ok 6 - moderating an active host transfers control and revokes old capabilities in both room engines
+  ---
+  duration_ms: 346.34991
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1750.687505
