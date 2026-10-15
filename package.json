@@ -17,7 +17,8 @@
     "test:multiplayer-api": "node --test tests/multiplayer-api.mjs",
     "test:all-games-browser": "tsx tests/all-games-browser.mjs",
     "test:access": "node --test tests/access.test.mjs",
-    "test:access-browser": "node tests/access-browser.mjs"
+    "test:access-browser": "node tests/access-browser.mjs",
+    "test:tabs-browser": "node tests/tabs-browser.mjs"
   },
   "dependencies": {
     "dotenv": "17.3.1",

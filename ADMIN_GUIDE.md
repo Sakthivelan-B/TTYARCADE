@@ -2,9 +2,13 @@
 
 ## 1. What changed in this revision
 
-New complete repository: **TTYARCADE-room-controls.zip**. Built on the working previous **TTYARCADE-upgraded.zip**, not a replacement architecture/theme. All six online games now have optional passwords and host kick controls. `/admin` now has ad-placement switches and expanded account/score details.
+Current complete repository: **TTYARCADE-tabs-update.zip**.
 
-**Existing installation: run `sql/upgrade-room-access.sql` BEFORE deploying this revision.** It adds nullable `password_hash` columns to both room tables and is safe to repeat. Existing rooms stay open (no password) until their hosts enable protection. No accounts/rooms/scores are deleted. Fresh and older-install SQL paths in HANDOVER also include these columns.
+Latest small update: the home waiting-room list is removed without deleting rooms. Opening a game in a new tab stops the older game tab locally and returns it home. No server leave/close or account logout occurs; saved online seats remain recoverable. Same-site/browser-profile only; use separate profiles/devices for independent players. Home/admin/settings/rules do not take over a game; solo in-memory progress is not saved. **No SQL migration when updating from TTYARCADE-room-controls.zip.**
+
+Room-access/admin baseline: **TTYARCADE-room-controls.zip**. Built on the working previous **TTYARCADE-upgraded.zip**, not a replacement architecture/theme. All six online games now have optional passwords and host kick controls. `/admin` now has ad-placement switches and expanded account/score details.
+
+**Earlier upgraded installation without room controls: run `sql/upgrade-room-access.sql` BEFORE deploying this revision.** It adds nullable `password_hash` columns to both room tables and is safe to repeat. Existing rooms stay open (no password) until their hosts enable protection. No accounts/rooms/scores are deleted. Fresh and older-install SQL paths in HANDOVER also include these columns.
 
 ## 2. Host: protect a room, change password, or kick
 
@@ -129,8 +133,8 @@ Rooms are still retained through disconnection/inactivity. The stored-room count
 
 ## 6. Deployment and verification for this revision
 
-1. Back up DB. On the already-upgraded installation, run **`sql/upgrade-room-access.sql`** as owner. Repeat execution is harmless. Other starting schemas: HANDOVER §3.
-2. Overlay the complete `TTYARCADE-room-controls.zip` source in a reviewed branch, preserving `.git` and private env; follow PUBLISHING.md.
+1. Back up DB. If coming from the earlier pre-room-controls upgraded installation, run **`sql/upgrade-room-access.sql`** as owner. From the room-controls release, this tab/home update needs no SQL. Repeat execution is harmless. Other starting schemas: HANDOVER §3.
+2. Overlay the complete `TTYARCADE-tabs-update.zip` source in a reviewed branch, preserving `.git` and private env; follow PUBLISHING.md.
 3. `npm ci`, lint, typecheck, unit tests, production build. Deploy on Node 22 LTS (recommended); test execution here used Node 20.20.2/PostgreSQL17/ChromiumLinux.
 4. Confirm all six room flows, wrong-password rejection, kick/rejoin and refresh. Promote only your own administrator, open `/admin`, toggle each ad flag and inspect account activity. Test preview against a separate DB.
 5. Ads remain off unless you deliberately change hosting configuration. No actual cloud deployment/Google approval is claimed.

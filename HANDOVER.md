@@ -1,8 +1,16 @@
 # TTYARCADE — upgraded developer handover
 
-**15 October 2026 · Tested deployment candidate, not a hosted deployment.** Built on the previous audited release, compared against `Sakthivelan-B/TTYARCADE` main commit `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Nothing was pushed to GitHub or deployed to a cloud account. The new archive is **TTYARCADE-room-controls.zip**; the earlier `TTYARCADE-final.zip` is not this release.
+**15 October 2026 · Tested deployment candidate, not a hosted deployment.** Built on the previous audited release, compared against `Sakthivelan-B/TTYARCADE` main commit `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Nothing was pushed to GitHub or deployed to a cloud account. The new archive is **TTYARCADE-tabs-update.zip**; the earlier `TTYARCADE-final.zip` is not this release.
 
-## Room-access / admin revision (latest)
+## Latest home / single-tab revision
+
+The home-page waiting-room block and its DB room-list queries have been removed; no retained rooms are purged. One active game document per same-origin browser profile is coordinated via `src/lib/game-tab.tsx`, called by Shell for gameplay routes (not rules). Newer game pages claim ownership; older game tabs perform a local full navigation to home, with a one-time notice. This unmounts their timers/polls without any explicit server leave/close, token deletion or account sign-out. Valid online seats remain reserved/recoverable in the newer tab. Any game page, including its mode menu, claims ownership; opening home/account/admin/settings/rules does not. Navigating back to a game can reclaim ownership; merely focusing the old home tab does not.
+
+The lease uses a fresh document ID (not copied sessionStorage IDs), reads current ownership before handling delayed events, and uses storage events plus BroadcastChannel fallback. Closing all tabs leaves only one overwritten local ownership record, not history. Separate origins/profiles/private contexts/devices do not coordinate. If both browser mechanisms are unavailable, cross-tab exclusion cannot be guaranteed; games remain usable. This is client coordination, not an anti-cheat or device/account security boundary. Solo in-memory progress is not saved by forced handoff. Browsers normally prohibit closing arbitrary tabs; the older tab returns home rather than closing its browser window.
+
+**No SQL change from the room-controls revision.** New archive `TTYARCADE-tabs-update.zip`; base archive SHA-256 `23538b2c9530970733e92a338759f0fb035ff4dba170195d47447c5197453715`. New browser suite covers six online handoffs with state/hand/turn/token preservation, cross-game ownership, refresh, separate-profile independence, each coordination fallback and rapid concurrent claims. All previous gameplay/retention/admin suites rerun; latest evidence is `audit/tabs/`.
+
+## Retained room-access / admin revision
 
 Read **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** for step-by-step host password/kick controls, first-admin SQL setup, ad switches and player moderation. On an installation already running the previous upgraded ZIP, run **`sql/upgrade-room-access.sql` before deployment**. New room passwords are salted scrypt hashes; old rooms remain open by default. Hosts can enable/change/disable passwords and kick another human; selected policy allows rejoining with the current password. Valid existing seats still refresh without retyping it. Passwords govern joining, not confidentiality of public room snapshots.
 
@@ -73,6 +81,7 @@ A root `.env` is read by Next and `drizzle.config.ts`, **not automatically sourc
 | Empty/new | `sql/schema.sql` — complete bootstrap, once. Not repeat-safe; don't run against initialized tables. |
 | Original seven-table repository, before audited logging/security additions | `sql/existing-database.sql` — one-time original-schema upgrade including the new fields. Not the previous-audit upgrade. |
 | Previous audited release (already has game_logs/reporting/RLS) | **`sql/upgrade-retention-ads.sql`** — additive, repeat-safe; includes activity flags, departure tracking, card host position, placements and room version. |
+| Previous room-controls release (has room-password columns) | No SQL change for the home/single-tab update. |
 | Previous upgraded release, already has retention/ads and room version | **`sql/upgrade-room-access.sql`** — repeat-safe room-password columns for this revision. |
 | Already applied retention/ads upgrade before multiplayer rules were added | `sql/upgrade-multiplayer-rules.sql` — repeat-safe `rooms.version` addition only; then run `upgrade-room-access.sql`. Not sufficient for a pre-retention database. |
 
@@ -201,7 +210,7 @@ Netlify requires a compatible Next/OpenNext runtime/adapter, not a static site e
 
 ## 8. Verification, evidence and honest limits
 
-Latest production build was restarted before the final gameplay regression run. Latest evidence in `audit/access/`; `audit/upgrade/` retains the preceding upgrade evidence:
+Latest production build was restarted before the final gameplay regression run. Latest evidence in `audit/tabs/`; `audit/access/` retains the preceding room-controls evidence; `audit/upgrade/` retains the preceding upgrade evidence:
 
 - ESLint, TypeScript and production build: PASS.
 - Unit: **9/9** (2048, bounded Snake, storage/controls, card encoding/tokens, ads, Memory lifecycle, board rules, race challenges, salted room-password rules).
