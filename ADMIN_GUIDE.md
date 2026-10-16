@@ -2,17 +2,17 @@
 
 ## 1. What changed in this revision
 
-Current complete repository: **TTYARCADE-tabs-update.zip**.
+Current complete repository: **TTYARCADE-70-games.zip**.
 
-Latest small update: the home waiting-room list is removed without deleting rooms. Opening a game in a new tab stops the older game tab locally and returns it home. No server leave/close or account logout occurs; saved online seats remain recoverable. Same-site/browser-profile only; use separate profiles/devices for independent players. Home/admin/settings/rules do not take over a game; solo in-memory progress is not saved. **No SQL migration when updating from TTYARCADE-room-controls.zip.**
+Current expansion: **70 games: 19 retained + 51 new**, including 15 new online games. Passwords, host controls and optional accounts apply to all 21 online games. Search/filter/sort on home finds modes and group sizes; instructions are closed until opened. Full inventory and rules: GAMES.md. No SQL migration from the current room-controls/tabs/Code Breaker releases.
 
-Room-access/admin baseline: **TTYARCADE-room-controls.zip**. Built on the working previous **TTYARCADE-upgraded.zip**, not a replacement architecture/theme. All six online games now have optional passwords and host kick controls. `/admin` now has ad-placement switches and expanded account/score details.
+The home waiting-room block stays removed. Opening a game in a new tab returns the previous game tab home without a server leave or logout. Same browser profile/origin only; separate profiles/devices are independent players. Solo progress is not saved by tab handoff.
 
 **Earlier upgraded installation without room controls: run `sql/upgrade-room-access.sql` BEFORE deploying this revision.** It adds nullable `password_hash` columns to both room tables and is safe to repeat. Existing rooms stay open (no password) until their hosts enable protection. No accounts/rooms/scores are deleted. Fresh and older-install SQL paths in HANDOVER also include these columns.
 
 ## 2. Host: protect a room, change password, or kick
 
-Applies to XoX, Connect Four, Memory, Math, Typing and Crazy Eights.
+Applies to all 21 online games: the six original games plus the 15 new card/strategy/cooperative games listed in GAMES.md.
 
 1. Select the online mode (Crazy Eights is already an online room game).
 2. Before **create room**, check **require room password** and enter 4–128 characters. Use a strong, unique password; it is case-sensitive and spaces are significant. Share the code/link **and password separately** with invited players.
@@ -25,13 +25,15 @@ Applies to XoX, Connect Four, Memory, Math, Typing and Crazy Eights.
 
 **Kick is removal, not a ban.** The old seat credential is revoked. The removed browser notices on its next poll, clears the old saved credential and offers joining again. The player may rejoin with the current password—or without one if protection is off. To exclude someone who still knows the password, change it and then kick them; there is no room ban list in this revision.
 
-During a waiting generic lobby the removed seat is deleted/positions compacted. During live games, array positions/hands are retained: departed board/card slots can be driven by CPU, Memory/races skip departed seats. A returning player can occupy an available CPU/departed slot, inheriting its game state rather than resetting the whole game. Crazy Eights retains its seven-card seat even in its waiting lobby to conserve all 104 cards. Kicking someone mid-suit-choice resolves the pending eight and advances safely. The host is never removed by their own kick action, so kicking another player does not close the room.
+During a waiting generic lobby the removed seat is deleted/positions compacted. During ORIGINAL live games, array positions/hands are retained: departed board/card slots can be driven by CPU, Memory/races skip departed seats. A returning player can occupy an available CPU/departed slot, inheriting its game state rather than resetting the whole game. Crazy Eights retains its seven-card seat even in its waiting lobby to conserve all 104 cards. Kicking someone mid-suit-choice resolves the pending eight and advances safely. The host is never removed by their own kick action, so kicking another player does not close the room.
+
+**NEW-game departure policy:** an explicit leave or kick ends the current round without a forfeit score; it does not delete the room for remaining people or silently invent a CPU. The host can invite replacements in the finished room and start a new round with at least two humans. Restart compacts active seats and redeals/regenerates. Old capabilities are revoked; kicked players may rejoin. Ordinary refresh/offline polling does not end a round.
 
 **Refresh remains seamless:** a valid saved seat capability or authenticated account reconnects without re-entering the password, even after the host changes it. Password changes govern **new joins**, not existing members. Use kick to revoke a particular existing seat. Refresh/network loss is still not an implicit leave, timeout or CPU takeover.
 
 Passwords are stored as salted scrypt hashes, never returned in room/list/admin responses, and not saved in localStorage. There is no “show forgotten room password”; the host can replace it. Credentials travel in JSON POST bodies over **HTTPS**. Hashing does not replace HTTPS. Per-process rate limiting slows password checks; public deployments still need trusted proxy/WAF limits across instances.
 
-**Privacy boundary:** room passwords control joining/seats. Room codes, membership/presence and normal public room snapshots are still observable by code/API. This is not an encrypted private chat or confidential game-state service. Crazy Eights private hands still require the matching seat capability. Never use a room password as your account password.
+**Privacy boundary:** room passwords control joining/seats. Room codes, membership/presence and normal public room snapshots are still observable by code/API. This is not an encrypted private chat or confidential game-state service. Crazy Eights and the new games’ private hands/fleets/briefings require the matching seat capability. New-game projections also redact hidden state from spectator/error responses. Never use a room password as your account password.
 
 ## 3. Set up the first administrator
 
@@ -134,9 +136,9 @@ Rooms are still retained through disconnection/inactivity. The stored-room count
 ## 6. Deployment and verification for this revision
 
 1. Back up DB. If coming from the earlier pre-room-controls upgraded installation, run **`sql/upgrade-room-access.sql`** as owner. From the room-controls release, this tab/home update needs no SQL. Repeat execution is harmless. Other starting schemas: HANDOVER §3.
-2. Overlay the complete `TTYARCADE-tabs-update.zip` source in a reviewed branch, preserving `.git` and private env; follow PUBLISHING.md.
+2. Overlay the complete `TTYARCADE-70-games.zip` source in a reviewed branch, preserving `.git` and private env; follow PUBLISHING.md.
 3. `npm ci`, lint, typecheck, unit tests, production build. Deploy on Node 22 LTS (recommended); test execution here used Node 20.20.2/PostgreSQL17/ChromiumLinux.
-4. Confirm all six room flows, wrong-password rejection, kick/rejoin and refresh. Promote only your own administrator, open `/admin`, toggle each ad flag and inspect account activity. Test preview against a separate DB.
+4. Confirm original and new room flows, wrong-password rejection, kick/rejoin and refresh. Promote only your own administrator, open `/admin`, toggle each ad flag and inspect account activity. Test preview against a separate DB.
 5. Ads remain off unless you deliberately change hosting configuration. No actual cloud deployment/Google approval is claimed.
 
 New repeatable checks, **disposable database only** (export test credentials securely; do not write them into Git):
@@ -148,4 +150,4 @@ npm run test:access
 npm run test:access-browser
 ```
 
-New checks: **8/8 API scenarios**, password and kick/rejoin browser flows for **all six** online games, admin authorization/ad persistence/activity UI, pending-eight kick, fresh/repeat/previous-release SQL migration. Earlier full gameplay/retention/all-19-game checks were rerun and passed; see `audit/access/`. No exhaustive load/soak/mobile/gamepad/anti-cheat certification. Five high development-only dependency advisories remain; production audit clean at the recorded snapshot.
+Verification for this release: room-access/admin API and browser suites, all 15 new online games’ full API rounds, two-browser hidden-information checks, and all-game/single-tab regressions. Current evidence is `audit/expansion/`; see HANDOVER §8 for exact counts and limits. No exhaustive load/soak/mobile/gamepad/anti-cheat certification. Five high development-only dependency advisories remain; production audit is clean at the recorded snapshot.

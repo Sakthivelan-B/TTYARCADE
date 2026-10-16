@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node --test tests/api.test.mjs",
-    "test:browser": "node tests/browser.mjs",
+    "test:browser": "tsx tests/browser.mjs",
     "test:unit": "tsx --test tests/unit.test.ts",
     "test:upgrade": "node --test tests/upgrade.test.mjs",
     "test:ads": "node tests/ads-browser.mjs",
@@ -18,7 +18,13 @@
     "test:all-games-browser": "tsx tests/all-games-browser.mjs",
     "test:access": "node --test tests/access.test.mjs",
     "test:access-browser": "node tests/access-browser.mjs",
-    "test:tabs-browser": "node tests/tabs-browser.mjs"
+    "test:tabs-browser": "node tests/tabs-browser.mjs",
+    "test:pack": "tsx --test tests/pack.test.ts",
+    "test:pack-api": "tsx --test tests/pack-api.test.ts",
+    "test:pack-browser": "tsx tests/pack-browser.ts",
+    "test:pack-online-browser": "node tests/pack-online-browser.mjs",
+    "docs:games": "tsx scripts/game-guide.ts",
+    "test:codebreaker": "node tests/codebreaker-browser.cjs"
   },
   "dependencies": {
     "dotenv": "17.3.1",

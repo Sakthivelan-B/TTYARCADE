@@ -1,71 +1,68 @@
 # TTYARCADE
 
-19 text/ASCII browser games in a fixed black/white CRT terminal. Next.js + React + PostgreSQL. Guests play immediately; accounts are optional.
+**70 text-only games: 19 retained + 51 new.** Fixed black/white CRT terminal, Next.js + React + PostgreSQL. Guests play immediately; accounts are optional.
 
-**Start with [HANDOVER.md](HANDOVER.md)** for architecture, exact environment values, SQL setup/upgrades, provider connection strings, AdSense/CMP, room lifecycle, seven-day inactivity flags, testing and Vercel/Render deployment. **[PUBLISHING.md](PUBLISHING.md)** covers the clean ZIP, review/commit/push and rollback.
+Start with **[HANDOVER.md](HANDOVER.md)** for architecture, environment/database setup, security, room lifecycle, admin, ads, tests and deployment. **[GAMES.md](GAMES.md)** lists every game/mode and all 51 new rule sets. **[PUBLISHING.md](PUBLISHING.md)** explains reviewing, updating GitHub and deploying. **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** covers host/admin controls.
 
-## Latest home / single-tab update
+## This release
 
-- Removed the home-page `$ who | grep waiting` room list (it was live waiting rooms, not play history). Rooms themselves are not deleted.
-- Only one active game tab per browser profile/site: opening any game in a newer tab returns the older game tab to home with a brief notice. No server leave/close or account logout is sent; online seats/tokens stay recoverable. Separate browsers/profiles/devices remain independent.
-- Opening home/admin/settings/rules does not stop a game. Solo progress is not saved by this handoff. If both cross-tab browser APIs are blocked, coordination cannot be guaranteed.
-- **No new SQL migration when updating from TTYARCADE-room-controls.zip.** Earlier installations still need their documented schema upgrades.
-- Latest download: **TTYARCADE-tabs-update.zip**; new regression command: `npm run test:tabs-browser`. Full prior regressions also rerun; evidence: `audit/tabs/`.
+- Eight new card games, including **13-card Rummy for 2–10 players**, with pure-run/group validation, optional jokers and scaled decks. No real-money betting.
+- Fifteen new online card/strategy/cooperative games; private hands, fleets and clues are filtered by the server. New reducers check moves, turns, declarations and finishing scores.
+- Thirty-five other new memory, word, number, logic and knowledge games. Thought-number starts at **1–20** and replaces each membership list. Children’s shuffled A–Z and ascending numbers share one untimed, non-punitive game.
+- Search, category/mode/group-size filters and sorting. Instructions stay closed until opened, across old and new games. No home waiting-room block.
+- Same-device live matches and named-player puzzle relays, handoff curtains and local match totals. Bounded sizes with ongoing levels/rematches; curated content can repeat.
+- Original Memory two-card reveal, Code Breaker fixed-secret/duplicate handling, room passwords, host kick-with-rejoin, optional login/admin, reversible inactivity flags, footer-only ad switches and one active game tab are retained.
+- New game departures end the round, **not the room**; the host can invite replacements and start another round. Offline tabs/refresh never surrender seats. New games do not pretend to have CPUs.
 
-## Retained room / admin revision
+**No new SQL needed from the current room-controls/tabs/Code Breaker release.** Older databases must use the correct supplied upgrade path. Never run fresh bootstrap SQL over an existing database.
 
-**[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** clearly explains host controls, first-admin setup, advertising and player moderation.
+## Run locally
 
-- Optional room password checkbox, server-checked passwords, host password changes and kick controls in all six online games. Kicked players can rejoin as selected; old capabilities are revoked.
-- Admin dashboard: persisted ad-placement toggles, configured/effective mode, searchable accounts/activity flags, per-game scores and recent guest/account submissions.
-- **If already on the previous upgraded release, run `sql/upgrade-room-access.sql` BEFORE deploying.** Existing rooms remain open until hosts enable a password.
-- New `test:access` (8 scenarios) and `test:access-browser` (six games + admin). Previous full regression suites rerun. Full usage/limits in ADMIN_GUIDE.
-
-## Retained earlier upgrade
-
-- Fixes online Memory's invisible second card with server-validated flips and a shared 1800ms reveal phase.
-- Server-validates all five generic online games; serialized commands, stale-version rejection, canonical results/scores, race challenge/deadline checks. Crazy Eights retains private hands/server rules.
-- Rooms persist through refresh, offline tabs and inactivity. Delete only on last human's explicit leave or host close; offline human seats are reserved, not auto-converted to CPUs.
-- Seven-day inactivity is a **reversible account flag**, not deletion or significant storage reclamation.
-- Optional env-configured footer-only advertising: default off, monochrome no-network placeholder, consent-gated live AdSense bridge with DB kill switches. No game-page ads or visual theme changes.
-- Repairs race input/timers, Minesweeper's initial grid, Lights Out reset and other gameplay edges. Retains previous Snake/2048/CPU/security fixes.
-
-## Local setup
-
-Node 22 LTS recommended, PostgreSQL 14+ for server features.
+Node 22, PostgreSQL 14+:
 
 ```bash
 npm ci
 cp .env.example .env
-# Fill DATABASE_URL and generated CRON_SECRET; ads default off.
-# Run the correct SQL script BEFORE starting (HANDOVER §3).
+# Set DATABASE_URL and a generated CRON_SECRET. Leave ads off.
+# For a NEW, empty database only, with DATABASE_URL exported in this shell:
+psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/schema.sql
 npm run dev
 ```
 
-Open http://localhost:3000. New DB: `sql/schema.sql`. **Previous audited DB: `sql/upgrade-retention-ads.sql`**. Other starting schemas have separate paths; don't run bootstrap against an existing DB. Never commit `.env`.
+Open http://localhost:3000. Next reads `.env`; psql does not load it automatically. For existing databases and exact provider connection strings, follow HANDOVER §§2–3 instead. Never commit private environment files.
+
+## Verify
 
 ```bash
 npm run lint
 npm run typecheck
 npm run test:unit
+npm run test:pack
 npm run build
 npm run start
-# Running isolated server/database + installed Playwright Chromium:
+# In another terminal, with the isolated app running:
+npx playwright install --with-deps chromium
 npm test
 npm run test:browser
 npm run test:all-games-browser
-npm run test:retention-browser
+npm run test:pack-browser
+npm run test:pack-online-browser
 npm run test:multiplayer-browser
-# Requires explicit disposable DB opt-in, detailed in HANDOVER:
-npm run test:upgrade
+npm run test:retention-browser
+npm run test:tabs-browser
+# Mutation suites require explicit disposable-DB settings (HANDOVER §8):
+npm run test:pack-api
 npm run test:multiplayer-api
+npm run test:upgrade
+npm run test:access
+npm run test:access-browser
 npm audit --omit=dev
 ```
 
-## Verified scope / limits
+Regenerate the full game guide with `npm run docs:games`. Current evidence: `audit/expansion/`.
 
-Build/lint/types, 9 unit tests, 4 baseline API tests, 4 retention tests, 6 expanded multiplayer tests, 8 room-access/admin scenarios, 26-route suite, playable paths across all 19 games and complete two-browser generic rounds passed. Full Crazy Eights API game verifies card conservation. Evidence: `audit/upgrade/`; scope/limits: HANDOVER §8.
+## Delivery / limits
 
-Runtime audit: zero vulnerabilities at snapshot; five high development-only ESLint-chain advisories remain. Public solo scores remain client-submitted; visible Memory patterns/Math answers and client CPU strategy mean **not anti-cheat**. Polling is not a zero-lag guarantee. No real cloud deployment, CMP certification, AdSense approval, mobile/gamepad hardware certification or long-term soak is claimed. Live external ad creatives can have color; off/placeholder keeps strict monochrome.
+Final repository: **TTYARCADE-70-games.zip**, not any earlier release ZIP. Compared against upstream `83e5309f09e5aceeec802603579ba3c435e449d0`; no push or cloud deployment performed. ZIP excludes secrets, `.git`, dependencies, generated output, test database contents and historical duplicate audit folders.
 
-New archive: **TTYARCADE-tabs-update.zip**. The previous TTYARCADE-final.zip is an older release.
+Ordinary solo scores remain client-submitted, not anti-cheat attestations. Polling is not a zero-lag guarantee. Fixed-size boards and finite curated banks mean repeat patterns/content are possible. No IQ/health benefit, mathematical infinity, real gamepad/mobile hardware certification or exhaustive load/soak testing is claimed. Runtime dependency audit is clean at the recorded snapshot; five high development-only ESLint-chain advisories remain. Live external ads can contain color; default-off/placeholder preserves strict monochrome.

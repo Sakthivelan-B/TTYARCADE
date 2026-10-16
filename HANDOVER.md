@@ -1,51 +1,73 @@
-# TTYARCADE — upgraded developer handover
+# TTYARCADE — 70-game developer handover
 
-**15 October 2026 · Tested deployment candidate, not a hosted deployment.** Built on the previous audited release, compared against `Sakthivelan-B/TTYARCADE` main commit `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Nothing was pushed to GitHub or deployed to a cloud account. The new archive is **TTYARCADE-tabs-update.zip**; the earlier `TTYARCADE-final.zip` is not this release.
+**16 October 2026 · Complete repository expansion · `TTYARCADE-70-games.zip`.**
 
-## Latest home / single-tab revision
+**51 NEW games + the existing 19 = 70 games.** The alphabet and numbers garden is ONE game with two modes, not two counted games. This builds on the previous audited code and retains the completed Code Breaker fix. No GitHub push or cloud deployment was performed.
 
-The home-page waiting-room block and its DB room-list queries have been removed; no retained rooms are purged. One active game document per same-origin browser profile is coordinated via `src/lib/game-tab.tsx`, called by Shell for gameplay routes (not rules). Newer game pages claim ownership; older game tabs perform a local full navigation to home, with a one-time notice. This unmounts their timers/polls without any explicit server leave/close, token deletion or account sign-out. Valid online seats remain reserved/recoverable in the newer tab. Any game page, including its mode menu, claims ownership; opening home/account/admin/settings/rules does not. Navigating back to a game can reclaim ownership; merely focusing the old home tab does not.
+Public upstream was compared again at **`83e5309f09e5aceeec802603579ba3c435e449d0`**. Against the previous delivered tabs ZIP, the only differing upstream source file was the already-fixed Code Breaker page. That logic is retained; only its instruction container is now collapsed. No unrelated upstream features were replaced. See `audit/expansion/UPSTREAM.md`.
 
-The lease uses a fresh document ID (not copied sessionStorage IDs), reads current ownership before handling delayed events, and uses storage events plus BroadcastChannel fallback. Closing all tabs leaves only one overwritten local ownership record, not history. Separate origins/profiles/private contexts/devices do not coordinate. If both browser mechanisms are unavailable, cross-tab exclusion cannot be guaranteed; games remain usable. This is client coordination, not an anti-cheat or device/account security boundary. Solo in-memory progress is not saved by forced handoff. Browsers normally prohibit closing arbitrary tabs; the older tab returns home rather than closing its browser window.
+## 1. What ships and where to start
 
-**No SQL change from the room-controls revision.** New archive `TTYARCADE-tabs-update.zip`; base archive SHA-256 `23538b2c9530970733e92a338759f0fb035ff4dba170195d47447c5197453715`. New browser suite covers six online handoffs with state/hand/turn/token preservation, cross-game ownership, refresh, separate-profile independence, each coordination fallback and rapid concurrent claims. All previous gameplay/retention/admin suites rerun; latest evidence is `audit/tabs/`.
+- **8 new card games:** 13-card Rummy, Go Fish, War, Higher or Lower, Twenty One, Sevens, Six-card Golf, Old Maid.
+- **8 turn-based strategy/cooperative games:** Nim, Dots and Boxes, Reversi, Mancala, Fleet Battle, Word Duel, Poisoned Chocolate, Secret Mission.
+- **35 other puzzle/learning games:** thought-number membership, alphabet/numbers garden, memory/knowledge/word/number/logic puzzles. Full names, routes, modes and all new rules are in **[GAMES.md](GAMES.md)**.
+- **15 new online games**, plus the 6 existing online games. All new online games also support same-device play; Higher or Lower is solo. Other new puzzles generally support solo + same-device round relay; thought-number and children’s garden are solo-only. No unsupported CPU mode is advertised for new games.
+- Home catalog: multiword search, play-mode/category/group-size filters, sort A–Z/Z–A/maximum players/new first, clear filters and no-results message. No bottom home waiting-room listing.
+- Instructions are collapsed by default through Shell on every gameplay route. Long original Code Breaker/2048/Minesweeper instruction panels and Memory/Math mode-menu rules also start collapsed. Board prompts and relevant controls remain visible.
+- Strict black `#000000` / white `#ffffff`, terminal text and monospace; no theme switch, images, canvas or external game assets. Existing layouts are retained apart from requested catalog/help changes. Expansion-only controls are scoped under `.pack-ui` in the same stylesheet.
+- Guests play immediately. Login/registration remains optional. Password checkbox, host controls, kick-with-rejoin, administrator dashboard, inactivity flags, advertising switches and single-active-game-tab coordination remain intact.
 
-## Retained room-access / admin revision
+### New source map
 
-Read **[ADMIN_GUIDE.md](ADMIN_GUIDE.md)** for step-by-step host password/kick controls, first-admin SQL setup, ad switches and player moderation. On an installation already running the previous upgraded ZIP, run **`sql/upgrade-room-access.sql` before deployment**. New room passwords are salted scrypt hashes; old rooms remain open by default. Hosts can enable/change/disable passwords and kick another human; selected policy allows rejoining with the current password. Valid existing seats still refresh without retyping it. Passwords govern joining, not confidentiality of public room snapshots.
-
-The admin UI now exposes persisted placement switches, effective/configured ad modes, searchable accounts, activity/inactive timestamps, per-game scores and latest 100 account/guest score submissions. Environment IDs/mode, real CMP/site approval, Google reporting and consent remain owner/provider responsibilities. Deprecated ADMIN_USERNAMES guidance was removed from the UI. New verification in `audit/access/`: **8 API scenarios**, six-game password/kick/rejoin browsers, admin UI/backend authorization/persistence, fresh/previous-release/repeated SQL. Previous all-19/playthrough/retention suites rerun successfully. Below documents the retained architecture; ADMIN_GUIDE supplies latest operational details.
-
-## 1. Architecture and preserved design
-
-19 text/ASCII browser games. Next.js App Router serves React pages and same-origin Node API routes; PostgreSQL/Drizzle stores accounts, rooms, hands and scores. No separate socket service, canvas, external font, game images or icon assets. Guests can play immediately: **registration/login is optional**, including online rooms and score submissions.
-
-Strict terminal black `#000000` / white `#ffffff`; selection may invert those same colors. No automatic/light theme. Existing layouts retained. `src/app/globals.css` is byte-identical to the previous audited release: SHA-256 `69b94197c54ece4ceacad6e190bc9de54affd9899e6b7e65ef0b82050a3a00bb`. Off/placeholder advertising retains this guarantee; actual Google creatives are outside application styling control.
-
-| Area | Source |
+| Area | Files |
 |---|---|
-| Games, registry | `src/app/games/*/page.tsx`, `src/lib/games.ts` |
-| Shell, text cards, device controls | `src/components/{term,Card,multi}.tsx`, `src/lib/controls.ts` |
-| Canonical generic online rules | `src/lib/{online-games,memory-rules,board-rules,race-rules}.ts` |
-| Generic room API | `src/app/api/rooms/` |
-| Private Crazy Eights hands/actions | `src/app/api/cards/rooms/`, `src/lib/cards.ts` |
-| Explicit departure/host handover | `src/lib/room-lifecycle.ts` |
-| Input activity and reversible flags | `src/lib/{activity,use-game-activity}.ts`, `api/activity`, `api/cron/cleanup` |
-| Ads/consent/placement policy | `src/lib/{ads,ad-consent}.ts`, `src/components/ads/` |
-| Auth/storage/error handling | `src/lib/{auth,http,rate-limit,storage}.ts` |
-| DB and SQL | `src/db/`, `sql/` |
-| Verification | `tests/`, `audit/upgrade/`, `audit/FILE_REVIEW.md` |
+| Canonical 51-game metadata / English rules | `src/lib/pack/catalog.ts` |
+| Immutable state and validated commands | `src/lib/pack/{core,index}.ts` |
+| Puzzle generators and reducers | `src/lib/pack/puzzles.ts` |
+| Card engine, physical-card accounting, Rummy validator | `src/lib/pack/card-games.ts` |
+| Strategy/cooperative engines | `src/lib/pack/strategy.ts` |
+| Server-only row-locked room adapter | `src/lib/pack/online.ts` |
+| Hidden-information allowlist projections | `projectPack` in `src/lib/pack/index.ts` |
+| Dynamic game route, mode/relay/handoff controller | `src/app/games/[game]/page.tsx`, `src/components/pack-game.tsx` |
+| Per-game text controls | `src/components/pack-board.tsx` |
+| Searchable catalog / shared registry | `src/components/game-catalog.tsx`, `src/lib/games.ts` |
+| Game guide generation | `scripts/game-guide.ts`, `npm run docs:games` |
 
-Generic room mutations are row-locked transactions. A monotonic `rooms.version` prevents stale gameplay updates; clients apply command responses immediately and ignore older snapshots. Memory polls at 500ms, other generic games at 1000ms. These are polling intervals, **not a latency SLA**. Crazy Eights retains its separate transactional action API.
+Original static game routes retain precedence over the dynamic expansion route. Unknown expansion IDs return 404. The registry is now 70 entries; game IDs remain compatible with the existing text database columns. **No new SQL migration is required from the current room-controls/tabs/Code Breaker release.** Keep the supplied older migration paths for older installations.
+
+### Authoritative online play and privacy
+
+New rooms reuse the generic room API and its whole-request `SELECT FOR UPDATE` transactions. Clients send `{action:"pack-command", command:{type:...}, expectVersion}`. Server reducers validate actor, action, card ownership/indices, board legality and phase; supplied state/status/score cannot replace the canonical state. Start/restart/rematch are host-only. The server deals/shuffles, generates fleets/private clues, increments versions and records positive finishing scores once. `/api/scores` refuses direct scores for the new online-only-in-server games; their local match totals remain on-device. Existing solo score reporting remains trust-based.
+
+`publicRoom(room, viewerSeat?)` calls the whitelist projection. **Deck order, opponent hands, unrevealed Golf cards, opponent fleets and other players’ Mission clues are not sent to the browser**, including spectator and stale/error responses. A valid seat token selects its private view. Mission clues disappear from projections after sealing. Never return raw pack state or add a debug-state endpoint. Server logs/error messages do not print secrets. This is access control, not end-to-end encryption; database operators can read stored state.
+
+Presence/offline polling does not alter ownership or auto-play a hand. In NEW games an explicit departure/kick ends the current round without awarding a forfeit score; the room and physical cards/state remain stored. Remaining host can invite replacements and rematch. A departed credential rotates; kicked players may rejoin with the current password. Finished expansion rooms accept replacements/new members up to capacity. Starting the next round removes departed seats, compacts active human seats and redeals/regenerates; host seat and saved identity follow the remapping. Fewer than two humans cannot start an online match. Last human explicit leave or host close deletes the room. Original board/Memory/race/Crazy Eights departure behavior is unchanged.
+
+### Same-device play, score and progression
+
+New live card/strategy matches use named players and a handoff curtain whenever the turn changes. Only the current player sees their private information. Same-device puzzles are **round relays, not simultaneous races**: each player receives a fresh puzzle at the same level, then the shared level rises after a full rotation. A board may be retried at its current level. Match totals remain in memory; mode menu/reload resets them. Do not use local relay totals for stakes or prizes.
+
+No final fixed level is imposed. Board sizes, generation work, display lengths and history are bounded. Difficulty eventually caps and fresh rounds continue; finite words/facts/events can recur, and random boards can repeat. Standard cards/boards offer endless rematches rather than increasingly huge boards. Existing Number Memory and Key Sequence now cap display lengths at **32** while continuing levels. The numeric level counter uses safe JavaScript integers; this is practical replayability, not a mathematical infinity/uniqueness claim or evidence of IQ/health improvement.
+
+Rummy specifically uses **13 cards partitioned into 3+3+3+4**, at least one pure same-suit run, distinct-suit equal-rank sets, A low/high without wrap, optional printed jokers and at least two natural cards in each non-pure group. Decks scale 1/2/3/4 for 2 / 3–5 / 6–8 / 9–10 players. A bitmask search finds valid partitions automatically. Invalid declarations do not mutate the hand/turn. Draw + discard conserves each physical card; stock recycling keeps the top discard and reshuffles the remainder. All card games are recreational, without real-money wagers.
+
+Nonogram, Sudoku and Cross Sums accept ANY valid completion, not just a generated hidden answer. Water Jugs uses reachable coprime-capacity targets; Peg Solitaire is generated by reverse legal jumps; Make Target stores a known integer expression; circuits have a known route; Logic Grid clues are added until unique; Rule Shift examples distinguish exactly one of its five documented candidate rules. The first thought-number round is exactly **1–20**; shuffled membership lists replace one another and invalid/out-of-range answer patterns are reported. The children’s game includes full A–Z and ascending-number modes, shuffled positions, untimed play, no lost lives and bounded large-touch grids.
+
+### Retained architecture
+
+Next.js App Router/React, same-origin Node APIs, PostgreSQL/Drizzle. Original rules remain in `src/lib/{online-games,memory-rules,board-rules,race-rules,cards}.ts`; Crazy Eights retains its separate private-card transaction API. Rooms use versioned snapshots, Memory 500ms and other generic games 1000ms polling; these intervals are not latency promises. `src/lib/game-tab.tsx` permits one active gameplay document per same-origin browser profile. A new game tab returns the older tab home without server leave/close, token removal or logout. Separate profiles/devices are independent; if both storage events and BroadcastChannel are blocked, coordination cannot be guaranteed. Solo in-memory progress is not saved by handoff.
+
+**Operational details follow:** environment, database initialization/upgrades, lifecycle, inactive accounts, ads, local/admin/cloud setup, and verification.
 
 ## 2. Runtime and exact environment
 
-Node **22 LTS recommended** (`.nvmrc`, package engines); PostgreSQL 14+. Tests here ran on Node **20.20.2**, PostgreSQL **17**, Chromium/Linux. Node 22 itself was not separately exercised. Next.js 16.4.1, React 19.3.1, TypeScript 5.9.3. Use the included lockfile and `npm ci`.
+Node **22 LTS recommended** (`.nvmrc`, package engines); PostgreSQL 14+. Final build/runtime and regression checks used Node **22.23.3**, PostgreSQL **17**, Chromium/Linux; earlier development also ran on Node 20.20.2. Next.js 16.4.1, React 19.3.1, TypeScript 5.9.3. Use the included lockfile and `npm ci`.
 
 | Variable | Required / exact meaning |
 |---|---|
 | `DATABASE_URL` | Server-only PostgreSQL URI: `postgresql://USER:PASSWORD@HOST:PORT/DATABASE?sslmode=require`. Use the provider's exact role, database, port and TLS parameters. Never make it `NEXT_PUBLIC_*`. No Supabase API key/anon key is needed. |
 | `CRON_SECRET` | Server-only scheduler secret; generate with `openssl rand -hex 32`. Set the same value on the app and scheduler. Missing returns 503; incorrect bearer returns 401. |
+| `TTYARCADE_EMBED_PREVIEW` | Preview-only `1` at BOTH build and start omits X-Frame-Options so Arena can embed the live app. Leave unset on normal production (SAMEORIGIN remains the default). |
 | `PORT` | Default local 3000; Render supplies its own. Omit on Vercel. |
 | `NODE_ENV` | Development for dev, production for build/start; normally managed by npm/host. Production account cookies require HTTPS. |
 | `NEXT_PUBLIC_ADSENSE_MODE` | `off` (default), `placeholder`, or `live`. Unknown values become off. |
@@ -81,7 +103,7 @@ A root `.env` is read by Next and `drizzle.config.ts`, **not automatically sourc
 | Empty/new | `sql/schema.sql` — complete bootstrap, once. Not repeat-safe; don't run against initialized tables. |
 | Original seven-table repository, before audited logging/security additions | `sql/existing-database.sql` — one-time original-schema upgrade including the new fields. Not the previous-audit upgrade. |
 | Previous audited release (already has game_logs/reporting/RLS) | **`sql/upgrade-retention-ads.sql`** — additive, repeat-safe; includes activity flags, departure tracking, card host position, placements and room version. |
-| Previous room-controls release (has room-password columns) | No SQL change for the home/single-tab update. |
+| Previous room-controls release (has room-password columns) | No SQL change for this 70-game expansion. |
 | Previous upgraded release, already has retention/ads and room version | **`sql/upgrade-room-access.sql`** — repeat-safe room-password columns for this revision. |
 | Already applied retention/ads upgrade before multiplayer rules were added | `sql/upgrade-multiplayer-rules.sql` — repeat-safe `rooms.version` addition only; then run `upgrade-room-access.sql`. Not sufficient for a pre-retention database. |
 
@@ -93,7 +115,7 @@ Main objects: `users`, `sessions`, `game_scores`, `rooms`, `room_players`, `card
 
 - Refresh, closing a tab, network loss and extended inactivity **do not delete rooms or relinquish human seats**. Offline presence is informational, never automatic CPU takeover. Account inactivity does not close rooms.
 - Tokens are stored per room in guarded localStorage; query `?room=CODE` reopens a saved session automatically. Login-backed generic join can also find that account's seat. Tokens are capability credentials: HTTPS only, avoid logging token-bearing query strings.
-- **Explicit Leave/mode-menu departure:** authenticated seat is surrendered; credential rotates; waiting generic seats compact, active games preserve array positions. Board/card departed seats can be driven by CPU; Memory/races skip departed humans. Host transfers to a remaining human. Last human's explicit leave deletes the room and its seats, even if CPUs remain.
+- **Explicit Leave/mode-menu departure in ORIGINAL games:** authenticated seat is surrendered; credential rotates; waiting generic seats compact, active games preserve array positions. Board/card departed seats can be driven by CPU; Memory/races skip departed humans. Host transfers to a remaining human. Last human's explicit leave deletes the room and its seats, even if CPUs remain.
 - **Host Close room:** explicit destructive room deletion; nonhosts get 403.
 - Failed leave does not discard the local credential. Lost guest storage cannot prove ownership; there is no name-based seat hijacking/recovery. Clearing storage is not a server leave. There is deliberately **no room-expiry cron**: abandoned credentials can leave rooms stored indefinitely.
 - New humans cannot append slots to an already-playing Memory/race. Existing owners may reconnect; explicit CPU/departed slots can be replaced. CPU fill is only available for tic-tac-toe/Connect Four and only before start; Memory/Math/Typing do not advertise unsupported CPUs.
@@ -108,7 +130,7 @@ New clients send `expectVersion`; stale updates return 409 with current room/sea
 - Math/Typing: `action: "race-answer", challenge, answer` or `"race-timeout", challenge`. Server generates challenges/deadlines, checks answers/current ID, allows only one concurrent winner and rejects early timeouts/late answers. Math target 30 (award current level), Typing target 8 (award one). Peer advancement clears partial input. Same-device Typing uses rotating relay turns.
 - Boards: requested board must change exactly one legal cell with correct mark/turn; Connect Four enforces gravity. Server derives result, scoreboard and finished status, ignoring supplied score/status. Clients still choose CPU strategy; server validates its legal move.
 - Start/restart/rematch are host-only. Mid-game restart is distinct from finished rematch; board rounds can retain/reset series scores. Memory/races get fresh server-generated boards/challenges. Nonhost restart affordances are disabled/hidden.
-- Server records generic verified finishes in `game_scores` (winning boards; active Memory/race totals), with room/round metadata. **Public `/api/scores` and solo games remain client-submitted**; callers can forge ordinary scores/metadata. Leaderboards are not anti-cheat attestations and must not be used for prizes.
+- Server records ORIGINAL generic verified finishes in `game_scores` (winning boards; active Memory/race totals), with room/round metadata. **Original public `/api/scores` and solo games remain client-submitted**; callers can forge ordinary scores/metadata. Leaderboards are not anti-cheat attestations and must not be used for prizes.
 
 Additional gameplay repairs: local CPU-turn input guards retained; race finished clocks stop; Minesweeper now renders its initial safe-click grid and cancels delayed resets; Lights Out reset clears won state; maze win effects are outside React state updaters; Code Breaker Enter prevents native duplicate submission; Pong clamps paddle collisions; sliding-board shuffling is bounded and cannot start solved. Existing Snake/2048/card/security fixes are retained.
 
@@ -208,45 +230,77 @@ Re-login/refresh and visit `/admin`. Do not promote arbitrary public usernames o
 
 Netlify requires a compatible Next/OpenNext runtime/adapter, not a static site export; separately configure a scheduler. Generic static hosting cannot run accounts/room APIs. No provider account deployment was tested here.
 
-## 8. Verification, evidence and honest limits
+## 8. Verification, evidence and limitations
 
-Latest production build was restarted before the final gameplay regression run. Latest evidence in `audit/tabs/`; `audit/access/` retains the preceding room-controls evidence; `audit/upgrade/` retains the preceding upgrade evidence:
+Current evidence is **`audit/expansion/`**, not old audit folders. Final production build/runtime used **Node 22.23.3**, PostgreSQL **17**, Chromium/Linux. Earlier development also ran on Node 20.20.2; Node 22 is the supported recommendation. Final checks:
 
-- ESLint, TypeScript and production build: PASS.
-- Unit: **9/9** (2048, bounded Snake, storage/controls, card encoding/tokens, ads, Memory lifecycle, board rules, race challenges, salted room-password rules).
-- Baseline API: **4/4**; retention/API upgrade: **4/4**; expanded multiplayer API: **6/6**, including concurrent/stale moves, state/score forgery rejection, race timeouts, full Crazy Eights game/104-card conservation, late-join slots, administrative host handover.
-- Room access/admin API: **8/8**, six-game password/kick/rejoin browser checks and authenticated admin UI/placement persistence: PASS.
-- Two-browser complete gameplay for all five generic games: Memory both cards visible on both peers, mismatch/turn change, refresh with first card open, matching extra turns, final totals/rematch; board wins/rematches; complete Math/Typing races and peer input clearing. Zero page errors.
-- Playable-path checks across **all 19 games**, including solved generated matrix/maze/slide/lights puzzles, solo progression, initial Minesweeper reveal/flags, local board wins. Not exhaustive every-level simulation.
-- **26-route** browser suite, internal links/theme/device-control smoke; six-game retention/refresh/leave/close suite: PASS.
-- Ads off, placeholder, mocked live consent/revocation, blocked loader, DB disable: PASS during upgrade; default-off rechecked on final production build. No real publisher approval, ad serving, impressions or clicks verified.
-- Fresh SQL bootstrap plus repeated additive migrations: PASS; prior-schema upgrade and strict seven-day boundary checks recorded.
-- Runtime dependency audit: **0 vulnerabilities** at snapshot. Full audit: **5 high, development-only**, ESLint dependency chain; see JSON. No forced downgrade was used. Re-audit before release.
+| Check | Result / scope |
+|---|---|
+| ESLint, TypeScript, production build | PASS |
+| Original unit suite | 9/9 |
+| New game logic suite | 66/66; seeded generated solves at levels 1/2/8/50/1,000,000, supported card/strategy seat counts, immutable commands, Rummy partitions/decks/recycling, physical-card conservation, alternative constraint solutions, hidden-state projections, rule uniqueness and bounded high-level states |
+| Baseline API | 4/4 |
+| New online API | 17/17: every one of 15 new online games finishes and rematches, plus 10-seat password/kick/rejoin/host transfer/compaction, idle retention, concurrent/stale moves and privacy/error checks |
+| Original expanded multiplayer API | 6/6, including full Crazy Eights and 104-card accounting |
+| Retention/account inactivity API | 4/4 |
+| Room-access/admin API | 8/8 |
+| General browser route/theme/link suite | 77 routes: 70 games plus home/account/admin/settings/login/leaderboard/rules; text-only DOM, pure black/white body, device-input/CPU/navigation checks |
+| New-game browser suite | Actual legal controls in all 51 new games; complete thought-number/children/cooperative cases, collapsed help, combined catalog filters, zero page errors; alphabet board fits a 390px viewport |
+| Hidden-information two-browser suite | Rummy draw/discard/peer turn/reconnect, Fleet alternating shots/privacy, Mission private briefs/sealing/either-peer team finish/rematch; zero page errors |
+| Original playable-path browser suite | All 19 retained game paths; solved representative generated puzzles/local board rounds; zero page errors |
+| Original online complete-round browsers | Memory two-card visibility, mismatch/match/turn/reconnect/finish/rematch; XoX/Connect Four; full Math/Typing races |
+| Single-active-tab browser | Original six online games plus Rummy/Fleet/Mission; preserved private views/tokens/state; separate-profile independence, storage/channel fallbacks, rapid claims |
+| Retention/browser, host/admin/browser | PASS; original room flows, failed-leave recovery, gamepad denial fallback, six-game passwords/kick/rejoin and authorized admin placement persistence |
+| Code Breaker regression | All 15,625 level-one score pairs, both screenshot histories (including unique 243), fixed secret/history, repeats/leading zeros, duplicate submissions, loss/retry; PASS |
+| Database | Fresh `schema.sql` bootstrap and repeat additive retention/version/access migrations PASS. No schema files changed from compared upstream. |
+| Ads | Default-off/no unconsented request/no game-page slots rechecked. Live/placeholder bridge logic retained; no real publisher approval or ad serving claimed. |
+| Clean extraction | ZIP extracted without private env/dependencies/build output; Node 22 `npm ci`, lint, types, 9 original units, 66 expansion units and production build PASS. All source/config bytes matched the delivery candidate. |
+| Dependency audit | Production: 0 vulnerabilities. Full development tree: 5 high ESLint-chain advisories; no forced dependency downgrade. |
 
-Reproduce, on an isolated DB/server only:
+Rummy API finishing uses a legal-hand fixture installed directly into the isolated test DB, then the real declaration endpoint; there is no application debug/backdoor endpoint. Other complete-round simulations use legal commands. Browser checks are representative input/progression checks, NOT exhaustive completion of every random level. Tests do not prove universal correctness.
+
+Some fast parallel/repeated harness runs initially hit the real per-IP rate limiter or matched multiple accessibility status elements. Test selectors now scope the intended status, and API mutation suites use a per-process test IP so unrelated tests do not share a rate bucket. Production rate limiting was not disabled. Final evidence logs record the rerun results.
+
+### Reproduce safely
 
 ```bash
+npm ci
 npm run lint
 npm run typecheck
 npm run test:unit
+npm run test:pack
 npm run build
-# Start server separately with the SAME isolated DB and cron secret.
-npm test
+# Separate terminal, configured with an ISOLATED test DB + cron secret:
+npm run start
 npx playwright install --with-deps chromium
+npm test
 npm run test:browser
-npm run test:retention-browser
 npm run test:all-games-browser
+npm run test:pack-browser
+npm run test:pack-online-browser
+npm run test:codebreaker
 npm run test:multiplayer-browser
-# Export ALLOW_DATABASE_TESTS=1, TEST_DATABASE_URL, TEST_CRON_SECRET securely:
-npm run test:upgrade
+npm run test:retention-browser
+npm run test:tabs-browser
+# Securely export these for mutation suites (do not commit their values):
+# ALLOW_DATABASE_TESTS=1
+# TEST_DATABASE_URL=<same DISPOSABLE database used by the test server>
+# TEST_CRON_SECRET=<that isolated server's CRON_SECRET>
+npm run test:pack-api
 npm run test:multiplayer-api
-# Ad mode must match the running app's build/env; tests mock Google:
+npm run test:upgrade
+npm run test:access
+npm run test:access-browser
 TEST_BASE_URL=http://127.0.0.1:3000 TEST_AD_MODE=off npm run test:ads
 npm audit --omit=dev
 ```
 
-Remaining limits: no distributed/long-duration load or soak test, real gamepad/mobile hardware certification, cloud deployment, real CMP/AdSense approval or universal lag/bug-free guarantee. Room offline seats intentionally wait rather than auto-play; unrecoverable abandoned rooms consume storage. Rate limiting is process-local; use provider WAF/request limits for public scale. Public solo score endpoint remains trust-based; Math answers and Memory patterns are visible to participants. Leaderboard UI reads top 4,000 stored score rows and compares unlike cross-game score scales; replace with SQL per-game rankings for scale. Fresh-pattern history is bounded/best-effort, not a mathematical never-repeat promise. Unbounded long-term scores/logs/retained rooms need an owner-approved retention/storage policy, separate from the chosen non-destructive inactivity flag. Short focus timers/route edge cases are not a proof of zero leaks. Do not infer exhaustive coverage from passing tests.
+Never point mutation suites at production. Knowledge/word banks are finite; maintain references when extending `puzzles.ts`. Tests use deterministic seeds; production starts use fresh random seeds. No distributed/load/long-soak testing, real mobile/gamepad hardware certification, cloud deployment, real CMP/AdSense approval, zero-lag guarantee or educational/medical benefit is claimed. In-browser solo game state/scores are not anti-cheat; even server-derived finishes are not suitable for monetary prizes or proof of identity.
 
-## 9. Publishing and rollback
+Rate limiting is process-local; use trusted proxy/WAF controls at scale. Polling intervals can be delayed in background tabs/network outages. Abandoned unrecoverable rooms are intentionally retained; long-term scores/logs/room storage require a separate owner-approved policy. Inactive flags do not meaningfully reclaim storage. Leaderboard reads at most 4,000 stored score rows and mixes differing game scales; use SQL per-game aggregation before scaling that feature. The game-tab policy is browser coordination, not security isolation. Do not log token-bearing room query strings.
 
-See **PUBLISHING.md** for exact clone/overlay/branch/push steps. No repository license was invented; confirm the owner's licensing choice. Archive excludes `.git`, `.env`, DB/browser state, dependencies, build artifacts and caches. Use a pull request, never force-push over newer remote work. Code rollback: provider's previous deployment or reviewed `git revert`; additive DB changes can normally remain for old code, but restore/backward compatibility must be tested. These SQL files are **not downgrade scripts**. Back up before migrations and preserve credentials securely.
+## 9. Clean delivery, publishing and rollback
+
+See **PUBLISHING.md** for clone/overlay/branch/test/push/deploy steps. The ZIP is the complete current repository, not a patch; no previous ZIP is needed. `HANDOVER.md`, `GAMES.md`, README, publishing/admin guides are at the extracted repository root. Necessary older SQL upgrade paths and regression tests remain; historical duplicate audits, earlier ZIPs and scratch files are excluded. No license was invented; confirm the owner's licensing choice.
+
+The archive excludes `.git`, all real `.env*`, dependencies, `.next`, caches, DB dumps, browser state and local credentials. `.env.example` is the placeholder template. Check the final checksum before extracting. Review/merge through a pull request, never force-push over newer work. Roll code back via the previous provider deployment or reviewed `git revert`; leave compatible additive columns or use an owner-reviewed migration/restore. Supplied SQL scripts are not downgrades. Back up the database before any deployment migration.

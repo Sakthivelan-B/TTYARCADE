@@ -1,76 +1,80 @@
-# Publish the TTYARCADE upgrade
+# Publish TTYARCADE — 70-game release
 
-New release: **TTYARCADE-tabs-update.zip** (not the previous TTYARCADE-final.zip). Complete architecture, exact environment/provider URI instructions, SQL choice, AdSense/CMP, refresh/leave behavior, seven-day flags, Vercel/Render deployment and limits: **[HANDOVER.md](HANDOVER.md)**.
+Complete source ZIP: **TTYARCADE-70-games.zip**. Read **HANDOVER.md** first. This release adds 51 new games without replacing the existing 19. It does not include a GitHub push or hosted deployment.
 
-**Already running TTYARCADE-room-controls.zip? No SQL migration for this home/single-tab update.** The archive removes the home waiting-room list and locally returns older game tabs home when a newer game tab opens. It does not delete rooms or log out accounts.
+## 1. Review and apply
 
-**Still running the earlier upgraded ZIP, before room controls?** Back up and run `sql/upgrade-room-access.sql` first. See **ADMIN_GUIDE.md** for room access, admin setup and ads/player management. This full archive includes the earlier upgrades as well.
-
-## 1. Review against current GitHub before applying
-
-Compared public main at `7a1aa47b424db0a46fab3bc5162356ca96ab30be`. Upstream may have changed since this audit. Authenticate with an authorized GitHub account using a credential manager or SSH; do not embed a token in a URL.
+Compared upstream main at **83e5309f09e5aceeec802603579ba3c435e449d0** on 16 October 2026. Against the prior delivered tabs source, upstream’s only different source file was the completed Code Breaker fix, which is retained. Upstream can change again; review rather than blindly overwriting newer work.
 
 ```bash
 git clone https://github.com/Sakthivelan-B/TTYARCADE.git
 cd TTYARCADE
 git fetch origin
-git switch -c upgrade/home-single-tab
+git switch -c expansion/70-games
 git log -1 --oneline
 ```
 
-Extract the ZIP **outside** the clone; its top-level directory is `TTYARCADE/`. Preserve clone `.git` and any private environment files. An overlay does not remove obsolete tracked files:
+Extract the ZIP outside the clone. Its top-level folder is `TTYARCADE/`; HANDOVER.md is at that repository root. Preserve the clone’s `.git` and ALL real environment files:
 
 ```bash
-unzip ~/Downloads/TTYARCADE-tabs-update.zip -d ../ttyarcade-release
-rsync -av --exclude='.git' --exclude='.env' ../ttyarcade-release/TTYARCADE/ ./
-git rm --ignore-unmatch drizzle.config.json
+unzip ~/Downloads/TTYARCADE-70-games.zip -d ../ttyarcade-release
+rsync -av --exclude='.git' --exclude='.env' --exclude='.env.local' \
+  --exclude='.env.production' --exclude='.env.production.local' \
+  ../ttyarcade-release/TTYARCADE/ ./
 ```
 
-On Windows extract/copy all contents, including `.gitignore`, `.env.example`, `.nvmrc`, preserving `.git`; remove obsolete `drizzle.config.json` if present. If remote has newer work, merge selectively, not a blind overwrite. The optional `TTYARCADE-tabs-update.patch` is relative to the previous delivered TTYARCADE-room-controls.zip, SHA-256 `23538b2c9530970733e92a338759f0fb035ff4dba170195d47447c5197453715`; it is not a cumulative patch against original main. Use `git apply --check` first on that exact extracted baseline. Do not apply the patch on top of the ZIP overlay.
+An overlay does not delete obsolete files. After making an external backup, remove old **audit reports only** so they do not look like current verification, then copy `audit/expansion/` from the ZIP. Do not delete source/tests/SQL migrations. Remove obsolete `drizzle.config.json` if present; the supported config is `drizzle.config.ts`. On Windows copy hidden `.gitignore`, `.env.example` and `.nvmrc` too, without replacing `.git` or private `.env*` files. No patch or intermediate ZIP needs applying first.
 
-## 2. Initialize or migrate DB BEFORE running new code
+## 2. Database first
 
-Back up and test on an isolated branch/restore. Choose exactly one initial route from HANDOVER §3:
+Back up and test on a disposable restore. For the current room-controls/tabs/Code Breaker database, **no migration is needed for this expansion**. Existing rooms, accounts and scores use the same schema.
 
-- Previous room-controls database: no SQL needed for this tab/home revision.
-- Previous upgraded database with room version/ads/retention: **`sql/upgrade-room-access.sql`**.
-- Empty database: `sql/schema.sql` once.
-- Original seven-table schema: `sql/existing-database.sql` once.
-- Previous audited database: **`sql/upgrade-retention-ads.sql`** (repeat-safe, includes version).
-- Already on the retention/ads upgrade but missing room version: `sql/upgrade-multiplayer-rules.sql`, then `sql/upgrade-room-access.sql`.
+| Starting point | SQL |
+|---|---|
+| Empty/new database | `sql/schema.sql` once |
+| Original seven-table schema, before audited logging/security | `sql/existing-database.sql` once |
+| Previous audited schema, before retention/ads | `sql/upgrade-retention-ads.sql` |
+| Has retention/ads but not room-version column | `sql/upgrade-multiplayer-rules.sql`, then `sql/upgrade-room-access.sql` |
+| Has retention/ads/version but no room passwords | `sql/upgrade-room-access.sql` |
+| Already has room-password columns and current schema | no SQL change |
 
-Run with SQL Editor as owner or `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/FILE.sql`, replacing FILE. Root `.env` is not automatically sourced by psql. Never run fresh schema on an initialized production DB. Preserve backups; scripts are not downgrades.
+Run the correct complete script as the trusted database owner, before deployment. CLI: `psql "$DATABASE_URL" -v ON_ERROR_STOP=1 -f sql/FILE.sql`. Next’s `.env` is not automatically read by psql. Never use the fresh bootstrap as an upgrade/rollback. Keep older migration files: they are needed installation paths, not unwanted old code.
 
-## 3. Verify and publish branch
+## 3. Build and test
 
 ```bash
 nvm install
 nvm use
 npm ci
 cp .env.example .env
-# Fill local disposable DATABASE_URL and CRON_SECRET; leave ads off.
+# Configure isolated DATABASE_URL + CRON_SECRET; ads off.
 npm run lint
 npm run typecheck
 npm run test:unit
+npm run test:pack
 npm run build
-# In a separate terminal: npm run start
-npm test
+# Separate terminal: npm run start
 npx playwright install --with-deps chromium
+npm test
 npm run test:browser
 npm run test:all-games-browser
-npm run test:retention-browser
+npm run test:pack-browser
+npm run test:pack-online-browser
 npm run test:multiplayer-browser
-# Securely export test-only ALLOW_DATABASE_TESTS=1, TEST_DATABASE_URL,
-# TEST_CRON_SECRET matching that isolated server, then:
-npm run test:upgrade
+npm run test:retention-browser
+npm run test:tabs-browser
+# Securely export ALLOW_DATABASE_TESTS=1, TEST_DATABASE_URL,
+# TEST_CRON_SECRET matching the isolated running server, then:
+npm run test:pack-api
 npm run test:multiplayer-api
+npm run test:upgrade
 npm run test:access
 npm run test:access-browser
-npm run test:tabs-browser
+TEST_BASE_URL=http://127.0.0.1:3000 TEST_AD_MODE=off npm run test:ads
 npm audit --omit=dev
 ```
 
-Then review **new files as well as tracked diffs**:
+Database/API mutation tests must NEVER target production. HANDOVER §8 explains coverage and limitations. Review all new files, not only tracked diffs:
 
 ```bash
 git status --short
@@ -79,35 +83,39 @@ git diff
 git add -A
 git diff --cached --stat
 git diff --cached
-# STOP if you see a real .env, password, token, DB dump or credentials.
-git commit -m "Preserve rooms, flag inactive accounts, add optional ads and validate multiplayer rules"
+# Stop if secrets, a DB dump, node_modules or build output appear.
+git commit -m "Add 51 games, private online engines, catalog filters and collapsed help"
 git remote -v
-# Confirm origin is the intended repository, then:
-git push -u origin upgrade/home-single-tab
+# Verify origin before pushing with your own authorized credentials:
+git push -u origin expansion/70-games
 ```
 
-Open a pull request, review/resolve newer remote changes, pass checks and merge into the repository's actual default branch. Do not force-push. If you lack write access, push a fork and open a PR. This agent has not pushed anything.
+Open/review a pull request and merge to the repository’s real default branch. Do not force-push; use a fork if you lack repository write access. Do not embed access tokens in URLs.
 
-## 4. Deploy and accept
+## 4. Deploy
 
 | Host | Build | Runtime |
 |---|---|---|
-| Vercel | Next.js preset, Node 22.x, `npm ci`, `npm run build` | Framework default, no static export |
+| Vercel | Next.js preset, Node 22.x, `npm ci`, `npm run build` | Framework default; NOT static export |
 | Render Web Service | Node 22, `npm ci && npm run build` | `npm run start -- --hostname 0.0.0.0 --port $PORT` |
 
-Configure server **DATABASE_URL**, **CRON_SECRET** and optional public ads env in the hosting dashboard. Use separate preview/production DBs. Rebuild after public env changes. See HANDOVER §7 for full steps; no cloud deployment was exercised here.
+Set server-only DATABASE_URL and CRON_SECRET in the hosting dashboard; optional public ad variables require rebuilding. Use separate preview/production databases. Leave `TTYARCADE_EMBED_PREVIEW` unset on a normal production site; the `1` option is only for trusted embedded previews and must be set at both build and start (Next records headers during build). Browser requests use same-origin relative URLs, never sandbox localhost addresses.
 
 Owner acceptance after HTTPS deployment:
 
-- `/api/health` is 200; guest can play without login.
-- Two separate browsers create/join/start; Memory shows **both** cards before mismatch resolution.
-- Refresh/offline tabs retain room/seat/hand; explicit leave transfers host; host close/last explicit leave deletes room.
-- Optional login, score attribution and SQL-promoted administrator work.
-- Daily authenticated cron flags old accounts, deletes expired sessions, **deletes no rooms/users/scores/logs**. Vercel schedule is 04:00 UTC; Render requires its own scheduled call.
-- Ads stay off unless deliberately configured. If enabling live, finish real CMP/site approval/privacy/ads.txt first, disable Auto ads, verify consent before network loading. Live Google creatives cannot be guaranteed monochrome.
+- `/api/health` returns 200; guest can play without login; catalog shows 70 games.
+- Rummy works for two browsers and larger groups; each player sees only their own hand. Draw/discard/declaration rules hold. Optional jokers survive refresh/rematch.
+- Fleet Battle hides enemy ships. Mission briefing reaches only its current seat and disappears after sealing. No raw-state/debug endpoint is present.
+- Original Memory shows both cards; Code Breaker retains one secret/history per round.
+- Refresh/offline tabs retain seats. Explicit leave/kick ends a NEW game round but retains the room; host can invite replacements/rematch. Last explicit human leave or host close deletes it. Kicked users can rejoin.
+- New game tab returns the older same-profile game tab home without server leave/logout. Different devices/profiles remain independent.
+- Optional login, score attribution and SQL-promoted `/admin` work. Daily authenticated cron flags inactive accounts and deletes expired sessions, not rooms/users/scores/logs.
+- Ads remain off unless deliberately configured; enabling live requires real CMP/site approval/privacy/ads.txt and Auto ads disabled. External creatives cannot be guaranteed monochrome.
 
-## 5. Rollback and clean archive
+No real cloud deployment, provider account access or Google approval was exercised here.
 
-Select previous provider deployment or `git revert` the reviewed merge commit. Do not blindly revert/overwrite schema; retain tested additive columns or use an owner-reviewed migration/backup restore. Never use bootstrap SQL for rollback.
+## 5. Rollback / archive hygiene
 
-ZIP includes source, lockfile, docs, SQL, regression tests and audit evidence. It excludes `.git`, `.env`, dependencies, `.next`, database/browser data and caches. The accompanying SHA-256 file detects archive corruption, not malicious provenance. See HANDOVER §8 for remaining trust-based score, rate-limit, storage and test-coverage limitations.
+Use the previous provider deployment or an owner-reviewed `git revert`. Keep compatible additive columns; these SQL scripts are not downgrades. Preserve database backups and credentials. Do not roll the live database back just to remove games.
+
+The ZIP contains source, lockfile, current docs, necessary SQL paths, tests and current audit evidence. It excludes `.git`, every private `.env*` (except `.env.example`), dependencies, `.next`, caches, scratch files, earlier archives and database/browser state. The final checksum detects corruption, not malicious provenance. Optional scores/logs/abandoned rooms still need an owner-approved storage policy; reversible inactive flags do not substantially reclaim storage.

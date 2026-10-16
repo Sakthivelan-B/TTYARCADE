@@ -1,0 +1,45 @@
+BEGIN
+psql:sql/upgrade-retention-ads.sql:3: NOTICE:  column "last_active_at" of relation "users" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:4: NOTICE:  column "inactive_at" of relation "users" already exists, skipping
+ALTER TABLE
+UPDATE 0
+ALTER TABLE
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:11: NOTICE:  relation "users_last_active_idx" already exists, skipping
+CREATE INDEX
+psql:sql/upgrade-retention-ads.sql:12: NOTICE:  column "left_at" of relation "room_players" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:13: NOTICE:  column "left_at" of relation "card_players" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:14: NOTICE:  column "host_position" of relation "card_rooms" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:19: NOTICE:  relation "ad_placements" already exists, skipping
+CREATE TABLE
+INSERT 0 0
+ALTER TABLE
+REVOKE
+DO
+CREATE FUNCTION
+DROP TRIGGER
+CREATE TRIGGER
+CREATE FUNCTION
+REVOKE
+REVOKE
+psql:sql/upgrade-retention-ads.sql:50: NOTICE:  column "version" of relation "rooms" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:51: NOTICE:  column "password_hash" of relation "rooms" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-retention-ads.sql:52: NOTICE:  column "password_hash" of relation "card_rooms" already exists, skipping
+ALTER TABLE
+COMMIT
+BEGIN
+psql:sql/upgrade-multiplayer-rules.sql:3: NOTICE:  column "version" of relation "rooms" already exists, skipping
+ALTER TABLE
+COMMIT
+BEGIN
+psql:sql/upgrade-room-access.sql:3: NOTICE:  column "password_hash" of relation "rooms" already exists, skipping
+ALTER TABLE
+psql:sql/upgrade-room-access.sql:4: NOTICE:  column "password_hash" of relation "card_rooms" already exists, skipping
+ALTER TABLE
+COMMIT

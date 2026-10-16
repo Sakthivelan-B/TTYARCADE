@@ -1,0 +1,46 @@
+Source/test changes against upstream 83e5309f09e5aceeec802603579ba3c435e449d0
+
+MODIFIED src/app/api/rooms/[code]/route.ts
+MODIFIED src/app/api/rooms/route.ts
+MODIFIED src/app/api/scores/route.ts
+MODIFIED src/app/games/2048/page.tsx
+NEW      src/app/games/[game]/page.tsx
+MODIFIED src/app/games/codebreaker/page.tsx
+MODIFIED src/app/games/math/page.tsx
+MODIFIED src/app/games/memory/page.tsx
+MODIFIED src/app/games/minesweeper/page.tsx
+MODIFIED src/app/games/numbers/page.tsx
+MODIFIED src/app/games/sequence/page.tsx
+MODIFIED src/app/games/typing/page.tsx
+MODIFIED src/app/globals.css
+MODIFIED src/app/page.tsx
+NEW      src/components/game-catalog.tsx
+MODIFIED src/components/multi.tsx
+NEW      src/components/pack-board.tsx
+NEW      src/components/pack-game.tsx
+MODIFIED src/components/term.tsx
+MODIFIED src/lib/games.ts
+MODIFIED src/lib/online-games.ts
+NEW      src/lib/pack/card-games.ts
+NEW      src/lib/pack/catalog.ts
+NEW      src/lib/pack/core.ts
+NEW      src/lib/pack/index.ts
+NEW      src/lib/pack/online.ts
+NEW      src/lib/pack/puzzles.ts
+NEW      src/lib/pack/strategy.ts
+MODIFIED src/lib/room-lifecycle.ts
+MODIFIED tests/access-browser.mjs
+MODIFIED tests/access.test.mjs
+MODIFIED tests/api.test.mjs
+MODIFIED tests/browser.mjs
+NEW      tests/codebreaker-browser.cjs
+NEW      tests/pack-api.test.ts
+NEW      tests/pack-browser.ts
+NEW      tests/pack-helpers.ts
+NEW      tests/pack-online-browser.mjs
+NEW      tests/pack.test.ts
+MODIFIED tests/tabs-browser.mjs
+MODIFIED tests/upgrade.test.mjs
+NEW      scripts/game-guide.ts
+
+SQL scripts are byte-identical. Root docs and package test scripts also updated. Historical duplicate audit reports removed. No authentication, ad engine, existing card engine or single-tab engine replacement.
