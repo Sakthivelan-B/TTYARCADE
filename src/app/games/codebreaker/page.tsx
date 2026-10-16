@@ -66,37 +66,57 @@ export default function CodeBreaker() {
   const [name] = usePlayerName();
   const [round, setRound] = useState<Round | null>(null);
   const [guess, setGuess] = useState("");
+  const [message, setMessage] = useState("");
+  // Synchronous round ownership also guards duplicate events before React renders.
+  const currentRound = useRef<Round | null>(null);
   const [best, report] = useBest("codebreaker");
   const [showHelp, setShowHelp] = useState(true);
   const inp = useRef<HTMLInputElement>(null);
 
   function begin(level: number, prevSecret?: string) {
-    setRound(newRound(level, prevSecret));
+    const next = newRound(level, prevSecret);
+    currentRound.current = next;
+    setRound(next);
     setGuess("");
+    setMessage("");
     setTimeout(() => inp.current?.focus(), 30);
   }
 
   function submit() {
-    if (!round || round.status !== "play") return;
-    if (guess.length !== round.len) return;
-    const r = { g: guess, ...score(round.secret, guess) };
-    const rows = [...round.rows, r];
-    const won = r.exact === round.len;
-    const lost = !won && rows.length >= round.tries;
-    setRound({ ...round, rows, status: won ? "won" : lost ? "lost" : "play" });
-    setGuess("");
-    if (won) {
-      report(round.level);
-      submitScore("codebreaker", round.level, { tries: rows.length }, name);
-    } else if (lost) {
-      submitScore("codebreaker", round.level - 1, {}, name);
+    const current = currentRound.current;
+    if (!current || current.status !== "play") return;
+    if (!new RegExp(`^[0-${current.digits - 1}]{${current.len}}$`).test(guess)) {
+      setMessage(`Enter exactly ${current.len} digits from 0-${current.digits - 1}. Repeated digits are allowed.`);
+      return;
     }
+    if (current.rows.some(row => row.g === guess)) {
+      setMessage("You already tried that guess. Check its feedback below; no attempt was used.");
+      inp.current?.focus();
+      return;
+    }
+    const row = { g: guess, ...score(current.secret, guess) };
+    const rows = [...current.rows, row];
+    const won = row.exact === current.len;
+    const lost = !won && rows.length >= current.tries;
+    // Keep the original secret. Only begin() ever generates another code.
+    const next: Round = { ...current, rows, status: won ? "won" : lost ? "lost" : "play" };
+    currentRound.current = next;
+    setRound(next);
+    setGuess("");
+    setMessage("");
+    if (won) {
+      report(current.level);
+      submitScore("codebreaker", current.level, { tries: rows.length }, name);
+    } else if (lost) {
+      submitScore("codebreaker", current.level - 1, {}, name);
+    }
+    inp.current?.focus();
   }
 
   // enter key submits from anywhere on the page
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.isComposing || (e.target as HTMLElement)?.closest("button")) return;
+      if (e.defaultPrevented || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.isComposing || (e.target as HTMLElement)?.closest("button")) return;
       if ((e.target as HTMLElement)?.closest("[data-terminal-header]")) return;
       if (e.key === "Enter" && round?.status === "play" && guess.length === round.len) { e.preventDefault(); submit(); }
     }
@@ -105,19 +125,20 @@ export default function CodeBreaker() {
   });
 
   return (
-    <Shell path="/games/codebreaker" title="code breaker" help="crack the hidden code. the code is FIXED for the whole level - it only changes when you beat the level or restart.">
+    <Shell path="/games/codebreaker" title="code breaker" help="crack the hidden code. one fixed code per round. keep using earlier feedback; only retry, next level or restart creates a new code.">
       <div className="box-dashed text-sm">
         <p className="font-bold">how to play</p>
-        <p>1. the computer picks a secret code (numbers only, no repeats needed).</p>
-        <p>2. type a guess of the same length and press enter.</p>
-        <p>3. feedback: <b>+</b> = right digit in the right place, <b>-</b> = right digit in the wrong place, <b>.</b> = not in the code.</p>
+        <p>1. the computer picks ONE secret code. repeated digits and leading zeros ARE allowed (for example, 242 or 004).</p>
+        <p>2. type a guess of the same length and press enter. only the input box clears; the secret and previous guesses stay unchanged.</p>
+        <p>3. feedback: <b>+</b> = right digit in the right place, <b>-</b> = right digit in the wrong place, <b>.</b> = an unmatched digit occurrence (including an extra copy).</p>
         <p>4. you get {round?.tries ?? 10} guesses. crack it to reach the next level (longer code, more digits).</p>
         <p className="dim mt-1">
           example (3-digit code): secret <b>413</b>, you guess <b>143</b> -&gt; the 3 is in the right
           place (+), the 1 and the 4 exist but sit in the wrong places (- -), so feedback is
           <b> +- -</b> shown as &quot;+--&quot;.
         </p>
-        <p className="dim">order of the marks does not matter: count the + first, then the -, then the dots.</p>
+        <p className="dim">marks are GROUPED COUNTS, not aligned with your digit positions. A + at the start does NOT mean your first digit is correct.</p>
+        <p className="dim">repeats example: secret <b>242</b>, guess <b>222</b> gives <b>++.</b>: two exact matches and one extra 2. Keep all earlier rows to narrow down the same code.</p>
       </div>
 
       <Stats
@@ -135,19 +156,21 @@ export default function CodeBreaker() {
       ) : (
         <div className="box mt-4">
           <p className="dim text-sm">
-            guesses so far (code stays the same all level):
+            guess history - one unchanged secret for this round:
           </p>
           <pre className="screen mt-2" style={{ lineHeight: 1.7 }}>
-            {"  #   GUESS     FEEDBACK\n"}
+            {"  #   GUESS         MARKS   EXACT  WRONG-PLACE  ABSENT\n"}
             {round.rows.length
               ? round.rows
                   .map(
                     (r, i) =>
-                      `  ${String(i + 1).padStart(2)}  ${r.g.split("").join(" ")}      ${"+".repeat(r.exact) || ""}${"-".repeat(r.near) || ""}${".".repeat(round.len - r.exact - r.near)}`,
+                      `  ${String(i + 1).padStart(2)}  ${r.g.split("").join(" ").padEnd(13)} ${("+".repeat(r.exact) + "-".repeat(r.near) + ".".repeat(round.len - r.exact - r.near)).padEnd(7)} ${String(r.exact).padStart(3)} ${String(r.near).padStart(10)} ${String(round.len - r.exact - r.near).padStart(8)}`,
                   )
                   .join("\n")
               : "  --  (none yet)"}
           </pre>
+          <p className="dim mt-2 text-xs">EXACT = correct position; WRONG-PLACE = correct digit elsewhere; ABSENT = unmatched occurrence. Counts always add up to the code length.</p>
+          {message && <p className="mt-2 text-sm" role="status">{message}</p>}
 
           {round.status === "play" && (
             <form
@@ -158,6 +181,8 @@ export default function CodeBreaker() {
               }}
             >
               <input
+                aria-label="code guess"
+                autoComplete="off"
                 ref={inp}
                 className="inp w-44 text-xl tracking-[0.4em]"
                 inputMode="numeric"
@@ -165,13 +190,14 @@ export default function CodeBreaker() {
                 maxLength={round.len}
                 onChange={(e) => {
                   const max = round.digits - 1;
+                  setMessage("");
                   setGuess(e.target.value.replace(new RegExp(`[^0-${max > 9 ? 9 : max}]`, "g"), "").slice(0, round.len));
                 }}
               />
               <button className="btn" disabled={guess.length !== round.len}>
                 guess
               </button>
-              <button type="button" className="btn" onClick={() => setGuess("")}>clear</button>
+              <button type="button" className="btn" onClick={() => { setGuess(""); setMessage(""); inp.current?.focus(); }}>clear</button>
               <span className="dim self-center text-xs">
                 {guess.length}/{round.len} digits
               </span>
@@ -193,18 +219,18 @@ export default function CodeBreaker() {
           title="locked out"
           lines={[`the code was ${round.secret}`, "same level again, but a NEW code is generated."]}
           action="retry level"
-          onAction={() => begin(round.level)}
+          onAction={() => begin(round.level, round.secret)}
         />
       )}
       {round && (
         <div className="mt-3 flex gap-2">
-          <button className="btn" onClick={() => begin(1)}>restart from level 1</button>
+          <button className="btn" onClick={() => begin(1, round.secret)}>restart from level 1</button>
           <button className="btn" onClick={() => setShowHelp((s) => !s)}>{showHelp ? "hide" : "show"} legend</button>
         </div>
       )}
       {showHelp && round && (
         <p className="dim mt-2 text-xs">
-          legend: + exact place · - wrong place · . not in code · digits allowed: 0-{round.digits - 1}
+          legend: + exact place · - wrong place · . unmatched/extra digit · repeats allowed · grouped counts, not positions · digits allowed: 0-{round.digits - 1}
         </p>
       )}
     </Shell>
