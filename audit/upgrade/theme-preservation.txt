@@ -1,3 +1,0 @@
-PASS: src/app/globals.css is byte-for-byte identical to the previous audited release.
-SHA-256: 69b94197c54ece4ceacad6e190bc9de54affd9899e6b7e65ef0b82050a3a00bb
-No new fonts, images, icons, gradients, colors or game-page ad placements.
