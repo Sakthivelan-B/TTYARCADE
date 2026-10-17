@@ -105,7 +105,7 @@ One 52-card deck; five cards each. Ask a named opponent for a rank you hold. Tak
 
 `/games/war` · cards · same device, online room
 
-Two players split a shuffled deck. Each reveals their top card. Higher rank (Ace high) takes the pot. Ties put up to three cards face down and another face up. A player unable to supply a battle card loses. First to all cards wins; after 200 battles the larger pile wins, or draw. New round reshuffles.
+Two players split a shuffled deck. Each reveals their top card. Higher rank (Ace high) takes the pot. Ties put up to three cards face down and another face up. Each face-up card appears immediately; the other slot stays hidden until that player reveals. A player unable to supply a battle card loses; if both run out together on a tie, it is a draw. First to all cards wins; after 200 battles the larger pile wins, or draw. New round reshuffles.
 
 ### Higher or Lower
 

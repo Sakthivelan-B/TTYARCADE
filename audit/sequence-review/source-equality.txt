@@ -1,0 +1,1 @@
+PASS: 122 application/test/SQL/configuration files byte-identical to clean extracted candidate which passed npm ci, lint, typecheck, 9+70 units and default production build. Only guides and audit evidence changed after extraction. Production audit: zero vulnerabilities.

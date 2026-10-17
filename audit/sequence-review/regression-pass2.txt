@@ -1,0 +1,66 @@
+
+> test:browser
+> tsx tests/browser.mjs
+
+PASS: 77 routes, internal links, strict terminal colors, text-only DOM, saved-light override, game input, local/online CPU and navigation smoke tests; no browser page errors.
+
+> test:multiplayer-browser
+> node tests/multiplayer-browser.mjs
+
+PASS memory: two-card reveal in both browsers, mismatch/turn change, first-card refresh, all pairs, score totals, completion and rematch.
+PASS tictactoe: alternating peers, legal moves, win detection, score, host-only rematch.
+PASS connect4: alternating peers, legal moves, win detection, score, host-only rematch.
+PASS math: server-scored complete race, peer partial input reset, stable winner, rematch.
+PASS typing: server-scored complete race, peer partial input reset, stable winner, rematch.
+PASS: complete two-browser gameplay for all five generic multiplayer games, no browser page errors. Crazy Eights full rules exercised by the API suite.
+
+> test:retention-browser
+> node tests/retention-browser.mjs
+
+PASS: all five generic games auto-resume playing state; Crazy Eights refresh + explicit last leave; failed leave retains token; host close; persisted controls; gamepad permission denial fallback; zero page errors.
+
+> test:access-browser
+> node tests/access-browser.mjs
+
+PASS tictactoe: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS connect4: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS memory: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS math: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS typing: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS crazy8: UI protected creation, wrong/correct join, host disables password, kick notification, rejoin without password, refresh.
+PASS admin: nonadmin rejection, authorized dashboard, persistent ad toggles, searchable account activity and self-protection; zero page errors.
+
+> test:tabs-browser
+> node tests/tabs-browser.mjs
+
+PASS home: waiting-room box/codes absent; retained rooms still exist.
+PASS tictactoe: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS connect4: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS memory: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS math: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS typing: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS crazy8: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS rummy: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS battleship: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS secret-mission: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS cross-game handoff and separate-profile independence.
+PASS tab coordination fallback: no-local-storage
+PASS tab coordination fallback: no-broadcast-channel
+PASS rapid tab claims: one winner, zero page errors. No server leave/close on tab takeover.
+
+> test:ads
+> node tests/ads-browser.mjs
+
+PASS: ad mode=off, blocked=false; no unconsented Google request; reserved footer, unchanged body theme, zero game-page ads, no page errors. Live script was locally mocked.
+
+> test:codebreaker
+> node tests/codebreaker-browser.cjs
+
+PASS: all 15,625 level-one secret/guess combinations match independent duplicate-aware scoring.
+PASS: screenshot feedback consistently allows fixed secrets 242 or 442.
+PASS: second screenshot has unique solution 243.
+PASS: screenshot guesses retain every history row, expected counts and the same three initial random draws.
+PASS: exact screenshot solution wins; duplicate guesses use no attempts; next level creates a new code; leading-zero/repeated-digit solution works.
+PASS: synchronous duplicate form events count once.
+PASS: exactly ten misses lock out, loss reveals the unchanged secret, retry resets history and creates a different code; mouse/Enter both work.
+PASS: zero browser page errors. Lint, types and production build also passed.

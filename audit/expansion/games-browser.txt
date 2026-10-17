@@ -1,0 +1,121 @@
+
+> test:pack-browser
+> tsx tests/pack-browser.ts
+
+PASS catalog: combined search, mode, group size, sorting and empty state
+PASS rummy: actual rendered controls accept a legal move
+PASS go-fish: actual rendered controls accept a legal move
+PASS war: actual rendered controls accept a legal move
+PASS higher-lower: actual rendered controls accept a legal move
+PASS twenty-one: actual rendered controls accept a legal move
+PASS sevens: actual rendered controls accept a legal move
+PASS golf-six: actual rendered controls accept a legal move
+PASS old-maid: actual rendered controls accept a legal move
+PASS thought-number: actual rendered controls accept a legal move
+PASS order-garden: actual rendered controls accept a legal move
+PASS corrupted-file: actual rendered controls accept a legal move
+PASS secret-mission: actual rendered controls accept a legal move
+PASS fact-chain: actual rendered controls accept a legal move
+PASS future-message: actual rendered controls accept a legal move
+PASS timeline-tangle: actual rendered controls accept a legal move
+PASS rule-shift: actual rendered controls accept a legal move
+PASS word-ladder: actual rendered controls accept a legal move
+PASS word-search: actual rendered controls accept a legal move
+PASS hangman: actual rendered controls accept a legal move
+PASS anagram-forge: actual rendered controls accept a legal move
+PASS category-sort: actual rendered controls accept a legal move
+PASS sentence-order: actual rendered controls accept a legal move
+PASS cipher-lab: actual rendered controls accept a legal move
+PASS binary-bridge: actual rendered controls accept a legal move
+PASS fraction-balance: actual rendered controls accept a legal move
+PASS make-target: actual rendered controls accept a legal move
+PASS nim: actual rendered controls accept a legal move
+PASS dots-boxes: actual rendered controls accept a legal move
+PASS reversi: actual rendered controls accept a legal move
+PASS mancala: actual rendered controls accept a legal move
+PASS battleship: actual rendered controls accept a legal move
+PASS word-duel: actual rendered controls accept a legal move
+PASS poisoned-chocolate: actual rendered controls accept a legal move
+PASS nonogram: actual rendered controls accept a legal move
+PASS mini-sudoku: actual rendered controls accept a legal move
+PASS cross-sums: actual rendered controls accept a legal move
+PASS river-crossing: actual rendered controls accept a legal move
+PASS water-jugs: actual rendered controls accept a legal move
+PASS tower-hanoi: actual rendered controls accept a legal move
+PASS circuit-route: actual rendered controls accept a legal move
+PASS laser-mirrors: actual rendered controls accept a legal move
+PASS balance-scale: actual rendered controls accept a legal move
+PASS peg-solitaire: actual rendered controls accept a legal move
+PASS knapsack-vault: actual rendered controls accept a legal move
+PASS path-sum: actual rendered controls accept a legal move
+PASS n-back: actual rendered controls accept a legal move
+PASS story-recall: actual rendered controls accept a legal move
+PASS mental-rotation: actual rendered controls accept a legal move
+PASS focus-switch: actual rendered controls accept a legal move
+PASS logic-grid: actual rendered controls accept a legal move
+PASS probability-pick: actual rendered controls accept a legal move
+PASS children numbers: complete first level, no timer
+PASS mobile: alphabet board fits 390px width
+PASS all 51 new game UIs, children modes, catalog, legacy help: zero page errors
+
+> test:pack-online-browser
+> node tests/pack-online-browser.mjs
+
+PASS two-browser Rummy: private hands, draw/discard, peer turn, reconnect, next draw
+PASS two-browser Fleet: alternating shots, incoming result, no opponent fleet in snapshots
+PASS two-browser Mission: seat-only clues, seal hides previous clue, either peer answers, cooperative finish and rematch
+PASS hidden-information browser integration: zero page errors
+
+> test:all-games-browser
+> tsx tests/all-games-browser.mjs
+
+PASS matrix: memorized pattern advances level
+PASS numbers: recalled number advances level
+PASS memory: solo two-flip move; full online round tested separately
+PASS sequence: observed sequence accepted
+PASS scramble: hints and accepted solution
+PASS odd: unique glyph advances level
+PASS maze: generated maze solved by BFS
+PASS slide: generated puzzle solvable and winning moves accepted
+PASS lights: solution and reset-after-win replay
+PASS math: solo level completion; online full race tested separately
+PASS codebreaker: Enter consumes exactly one guess
+PASS typing: exact solo line accepted; online full race tested separately
+PASS snake: started and directional input; bounded generation unit tested
+PASS minesweeper: initial grid, safe first reveal, flood fill and flag
+PASS tictactoe: local full round; online tested separately
+PASS connect4: local full round; online tested separately
+PASS 2048: all directional bindings and merge rules unit tested
+PASS pong: simulation and paddle input
+PASS crazy8: browser create, CPU seat and start; full rules/finish tested by API
+PASS: playable-path checks for all 19 games, zero page errors. Not exhaustive coverage of every generated level.
+
+> test:codebreaker
+> node tests/codebreaker-browser.cjs
+
+PASS: all 15,625 level-one secret/guess combinations match independent duplicate-aware scoring.
+PASS: screenshot feedback consistently allows fixed secrets 242 or 442.
+PASS: second screenshot has unique solution 243.
+PASS: screenshot guesses retain every history row, expected counts and the same three initial random draws.
+PASS: exact screenshot solution wins; duplicate guesses use no attempts; next level creates a new code; leading-zero/repeated-digit solution works.
+PASS: synchronous duplicate form events count once.
+PASS: exactly ten misses lock out, loss reveals the unchanged secret, retry resets history and creates a different code; mouse/Enter both work.
+PASS: zero browser page errors. Lint, types and production build also passed.
+
+> test:tabs-browser
+> node tests/tabs-browser.mjs
+
+PASS home: waiting-room box/codes absent; retained rooms still exist.
+PASS tictactoe: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS connect4: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS memory: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS math: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS typing: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS crazy8: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS rummy: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS battleship: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS secret-mission: new same-profile tab owns saved seat, older tab returns home, room/turn/state/hand/token retained, refresh works.
+PASS cross-game handoff and separate-profile independence.
+PASS tab coordination fallback: no-local-storage
+PASS tab coordination fallback: no-broadcast-channel
+PASS rapid tab claims: one winner, zero page errors. No server leave/close on tab takeover.

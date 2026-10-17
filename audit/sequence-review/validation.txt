@@ -1,0 +1,585 @@
+
+> docs:games
+> tsx scripts/game-guide.ts
+
+Wrote GAMES.md: 70 games, 51 new rule sets.
+
+> lint
+> eslint .
+
+
+> typecheck
+> tsc --noEmit
+
+
+> test:unit
+> tsx --test tests/unit.test.ts
+
+TAP version 13
+# Subtest: 2048 merges each tile once and reports gain
+ok 1 - 2048 merges each tile once and reports gain
+  ---
+  duration_ms: 2.805345
+  type: 'test'
+  ...
+# Subtest: Snake high levels are bounded, unique, and preserve spawn lane
+ok 2 - Snake high levels are bounded, unique, and preserve spawn lane
+  ---
+  duration_ms: 11.057257
+  type: 'test'
+  ...
+# Subtest: corrupted storage data cannot crash level generator or controls
+ok 3 - corrupted storage data cannot crash level generator or controls
+  ---
+  duration_ms: 0.303988
+  type: 'test'
+  ...
+# Subtest: card encodings include two-digit ranks and secure tokens
+ok 4 - card encodings include two-digit ranks and secure tokens
+  ---
+  duration_ms: 12.103593
+  type: 'test'
+  ...
+# Subtest: ad configuration fails closed without changing terminal styles
+ok 5 - ad configuration fails closed without changing terminal styles
+  ---
+  duration_ms: 7.876842
+  type: 'test'
+  ...
+# Subtest: Memory pairs: both cards stay revealed, resolution is delayed, matches retain turn and departed seats are skipped
+ok 6 - Memory pairs: both cards stay revealed, resolution is delayed, matches retain turn and departed seats are skipped
+  ---
+  duration_ms: 10.676381
+  type: 'test'
+  ...
+# Subtest: online board rules validate moves, gravity, diagonals and wins without trusting score payloads
+ok 7 - online board rules validate moves, gravity, diagonals and wins without trusting score payloads
+  ---
+  duration_ms: 8.377357
+  type: 'test'
+  ...
+# Subtest: server race challenges have valid answers and deadlines
+ok 8 - server race challenges have valid answers and deadlines
+  ---
+  duration_ms: 11.4711
+  type: 'test'
+  ...
+# Subtest: room passwords: salted hashes, strict validation, explicit disable and existing-password preservation
+ok 9 - room passwords: salted hashes, strict validation, explicit disable and existing-password preservation
+  ---
+  duration_ms: 474.896562
+  type: 'test'
+  ...
+1..9
+# tests 9
+# suites 0
+# pass 9
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 807.412252
+
+> test:pack
+> tsx --test tests/pack.test.ts
+
+TAP version 13
+# Subtest: 70 distinct routes; 51 new identities; modes and caps are honest
+ok 1 - 70 distinct routes; 51 new identities; modes and caps are honest
+  ---
+  duration_ms: 1.504056
+  type: 'test'
+  ...
+# Subtest: thought-number: solve generated levels without mutation
+ok 2 - thought-number: solve generated levels without mutation
+  ---
+  duration_ms: 26.209557
+  type: 'test'
+  ...
+# Subtest: order-garden: solve generated levels without mutation
+ok 3 - order-garden: solve generated levels without mutation
+  ---
+  duration_ms: 13.825057
+  type: 'test'
+  ...
+# Subtest: corrupted-file: solve generated levels without mutation
+ok 4 - corrupted-file: solve generated levels without mutation
+  ---
+  duration_ms: 1.240714
+  type: 'test'
+  ...
+# Subtest: fact-chain: solve generated levels without mutation
+ok 5 - fact-chain: solve generated levels without mutation
+  ---
+  duration_ms: 2.986018
+  type: 'test'
+  ...
+# Subtest: future-message: solve generated levels without mutation
+ok 6 - future-message: solve generated levels without mutation
+  ---
+  duration_ms: 1.697349
+  type: 'test'
+  ...
+# Subtest: timeline-tangle: solve generated levels without mutation
+ok 7 - timeline-tangle: solve generated levels without mutation
+  ---
+  duration_ms: 3.799508
+  type: 'test'
+  ...
+# Subtest: rule-shift: solve generated levels without mutation
+ok 8 - rule-shift: solve generated levels without mutation
+  ---
+  duration_ms: 3.384214
+  type: 'test'
+  ...
+# Subtest: word-ladder: solve generated levels without mutation
+ok 9 - word-ladder: solve generated levels without mutation
+  ---
+  duration_ms: 1.918024
+  type: 'test'
+  ...
+# Subtest: word-search: solve generated levels without mutation
+ok 10 - word-search: solve generated levels without mutation
+  ---
+  duration_ms: 5.263505
+  type: 'test'
+  ...
+# Subtest: hangman: solve generated levels without mutation
+ok 11 - hangman: solve generated levels without mutation
+  ---
+  duration_ms: 1.797418
+  type: 'test'
+  ...
+# Subtest: anagram-forge: solve generated levels without mutation
+ok 12 - anagram-forge: solve generated levels without mutation
+  ---
+  duration_ms: 1.888185
+  type: 'test'
+  ...
+# Subtest: category-sort: solve generated levels without mutation
+ok 13 - category-sort: solve generated levels without mutation
+  ---
+  duration_ms: 3.068154
+  type: 'test'
+  ...
+# Subtest: sentence-order: solve generated levels without mutation
+ok 14 - sentence-order: solve generated levels without mutation
+  ---
+  duration_ms: 2.547219
+  type: 'test'
+  ...
+# Subtest: cipher-lab: solve generated levels without mutation
+ok 15 - cipher-lab: solve generated levels without mutation
+  ---
+  duration_ms: 0.723236
+  type: 'test'
+  ...
+# Subtest: binary-bridge: solve generated levels without mutation
+ok 16 - binary-bridge: solve generated levels without mutation
+  ---
+  duration_ms: 1.443443
+  type: 'test'
+  ...
+# Subtest: fraction-balance: solve generated levels without mutation
+ok 17 - fraction-balance: solve generated levels without mutation
+  ---
+  duration_ms: 2.348194
+  type: 'test'
+  ...
+# Subtest: make-target: solve generated levels without mutation
+ok 18 - make-target: solve generated levels without mutation
+  ---
+  duration_ms: 2.191763
+  type: 'test'
+  ...
+# Subtest: nonogram: solve generated levels without mutation
+ok 19 - nonogram: solve generated levels without mutation
+  ---
+  duration_ms: 5.919737
+  type: 'test'
+  ...
+# Subtest: mini-sudoku: solve generated levels without mutation
+ok 20 - mini-sudoku: solve generated levels without mutation
+  ---
+  duration_ms: 3.345151
+  type: 'test'
+  ...
+# Subtest: cross-sums: solve generated levels without mutation
+ok 21 - cross-sums: solve generated levels without mutation
+  ---
+  duration_ms: 2.47324
+  type: 'test'
+  ...
+# Subtest: river-crossing: solve generated levels without mutation
+ok 22 - river-crossing: solve generated levels without mutation
+  ---
+  duration_ms: 23.322408
+  type: 'test'
+  ...
+# Subtest: water-jugs: solve generated levels without mutation
+ok 23 - water-jugs: solve generated levels without mutation
+  ---
+  duration_ms: 27.372648
+  type: 'test'
+  ...
+# Subtest: tower-hanoi: solve generated levels without mutation
+ok 24 - tower-hanoi: solve generated levels without mutation
+  ---
+  duration_ms: 7.954338
+  type: 'test'
+  ...
+# Subtest: circuit-route: solve generated levels without mutation
+ok 25 - circuit-route: solve generated levels without mutation
+  ---
+  duration_ms: 8.908602
+  type: 'test'
+  ...
+# Subtest: laser-mirrors: solve generated levels without mutation
+ok 26 - laser-mirrors: solve generated levels without mutation
+  ---
+  duration_ms: 1.555656
+  type: 'test'
+  ...
+# Subtest: balance-scale: solve generated levels without mutation
+ok 27 - balance-scale: solve generated levels without mutation
+  ---
+  duration_ms: 0.415832
+  type: 'test'
+  ...
+# Subtest: peg-solitaire: solve generated levels without mutation
+ok 28 - peg-solitaire: solve generated levels without mutation
+  ---
+  duration_ms: 1.941366
+  type: 'test'
+  ...
+# Subtest: knapsack-vault: solve generated levels without mutation
+ok 29 - knapsack-vault: solve generated levels without mutation
+  ---
+  duration_ms: 8.104248
+  type: 'test'
+  ...
+# Subtest: path-sum: solve generated levels without mutation
+ok 30 - path-sum: solve generated levels without mutation
+  ---
+  duration_ms: 5.666972
+  type: 'test'
+  ...
+# Subtest: n-back: solve generated levels without mutation
+ok 31 - n-back: solve generated levels without mutation
+  ---
+  duration_ms: 2.188695
+  type: 'test'
+  ...
+# Subtest: story-recall: solve generated levels without mutation
+ok 32 - story-recall: solve generated levels without mutation
+  ---
+  duration_ms: 1.44459
+  type: 'test'
+  ...
+# Subtest: mental-rotation: solve generated levels without mutation
+ok 33 - mental-rotation: solve generated levels without mutation
+  ---
+  duration_ms: 1.41744
+  type: 'test'
+  ...
+# Subtest: focus-switch: solve generated levels without mutation
+ok 34 - focus-switch: solve generated levels without mutation
+  ---
+  duration_ms: 2.297868
+  type: 'test'
+  ...
+# Subtest: logic-grid: solve generated levels without mutation
+ok 35 - logic-grid: solve generated levels without mutation
+  ---
+  duration_ms: 3.523604
+  type: 'test'
+  ...
+# Subtest: probability-pick: solve generated levels without mutation
+ok 36 - probability-pick: solve generated levels without mutation
+  ---
+  duration_ms: 0.633552
+  type: 'test'
+  ...
+# Subtest: go-fish: full legal round at all supported seat counts
+ok 37 - go-fish: full legal round at all supported seat counts
+  ---
+  duration_ms: 55.33365
+  type: 'test'
+  ...
+# Subtest: war: full legal round at all supported seat counts
+ok 38 - war: full legal round at all supported seat counts
+  ---
+  duration_ms: 70.294735
+  type: 'test'
+  ...
+# Subtest: higher-lower: full legal round at all supported seat counts
+ok 39 - higher-lower: full legal round at all supported seat counts
+  ---
+  duration_ms: 1.712844
+  type: 'test'
+  ...
+# Subtest: twenty-one: full legal round at all supported seat counts
+ok 40 - twenty-one: full legal round at all supported seat counts
+  ---
+  duration_ms: 3.625372
+  type: 'test'
+  ...
+# Subtest: sevens: full legal round at all supported seat counts
+ok 41 - sevens: full legal round at all supported seat counts
+  ---
+  duration_ms: 34.292054
+  type: 'test'
+  ...
+# Subtest: golf-six: full legal round at all supported seat counts
+ok 42 - golf-six: full legal round at all supported seat counts
+  ---
+  duration_ms: 36.099851
+  type: 'test'
+  ...
+# Subtest: old-maid: full legal round at all supported seat counts
+ok 43 - old-maid: full legal round at all supported seat counts
+  ---
+  duration_ms: 35.793451
+  type: 'test'
+  ...
+# Subtest: nim: full legal round at all supported seat counts
+ok 44 - nim: full legal round at all supported seat counts
+  ---
+  duration_ms: 2.168217
+  type: 'test'
+  ...
+# Subtest: dots-boxes: full legal round at all supported seat counts
+ok 45 - dots-boxes: full legal round at all supported seat counts
+  ---
+  duration_ms: 9.660956
+  type: 'test'
+  ...
+# Subtest: reversi: full legal round at all supported seat counts
+ok 46 - reversi: full legal round at all supported seat counts
+  ---
+  duration_ms: 15.268438
+  type: 'test'
+  ...
+# Subtest: mancala: full legal round at all supported seat counts
+ok 47 - mancala: full legal round at all supported seat counts
+  ---
+  duration_ms: 0.898185
+  type: 'test'
+  ...
+# Subtest: battleship: full legal round at all supported seat counts
+ok 48 - battleship: full legal round at all supported seat counts
+  ---
+  duration_ms: 3.739633
+  type: 'test'
+  ...
+# Subtest: word-duel: full legal round at all supported seat counts
+ok 49 - word-duel: full legal round at all supported seat counts
+  ---
+  duration_ms: 0.827415
+  type: 'test'
+  ...
+# Subtest: poisoned-chocolate: full legal round at all supported seat counts
+ok 50 - poisoned-chocolate: full legal round at all supported seat counts
+  ---
+  duration_ms: 2.608061
+  type: 'test'
+  ...
+# Subtest: secret-mission: full legal round at all supported seat counts
+ok 51 - secret-mission: full legal round at all supported seat counts
+  ---
+  duration_ms: 1.336018
+  type: 'test'
+  ...
+# Subtest: Rummy scales decks for 2–10; stock/draw/discard conserve every physical card
+ok 52 - Rummy scales decks for 2–10; stock/draw/discard conserve every physical card
+  ---
+  duration_ms: 620.111095
+  type: 'test'
+  ...
+# Subtest: Rummy meld rules: pure, jokers, Ace high/low, duplicate suits, no wrap
+ok 53 - Rummy meld rules: pure, jokers, Ace high/low, duplicate suits, no wrap
+  ---
+  duration_ms: 0.626262
+  type: 'test'
+  ...
+# Subtest: Rummy declaration partitions exactly 3+3+3+4, requires pure run, and is atomic
+ok 54 - Rummy declaration partitions exactly 3+3+3+4, requires pure run, and is atomic
+  ---
+  duration_ms: 46.605895
+  type: 'test'
+  ...
+# Subtest: Private projections exclude decks, opponent hands, fleets and sealed clues
+ok 55 - Private projections exclude decks, opponent hands, fleets and sealed clues
+  ---
+  duration_ms: 1.538845
+  type: 'test'
+  ...
+# Subtest: Puzzle projections hide solutions and previous observations
+ok 56 - Puzzle projections hide solutions and previous observations
+  ---
+  duration_ms: 0.82685
+  type: 'test'
+  ...
+# Subtest: All thought numbers 1–20 resolve; inconsistent range answers do not invent a result
+ok 57 - All thought numbers 1–20 resolve; inconsistent range answers do not invent a result
+  ---
+  duration_ms: 2.382506
+  type: 'test'
+  ...
+# Subtest: Wrong actors, malformed commands, repeated actions and invalid indices do not mutate state
+ok 58 - Wrong actors, malformed commands, repeated actions and invalid indices do not mutate state
+  ---
+  duration_ms: 11.199081
+  type: 'test'
+  ...
+# Subtest: Constraint puzzles accept alternative valid solutions, not only hidden generator answers
+ok 59 - Constraint puzzles accept alternative valid solutions, not only hidden generator answers
+  ---
+  duration_ms: 0.258548
+  type: 'test'
+  ...
+# Subtest: Children mistakes never consume lives; memory mismatch closes at three misses
+ok 60 - Children mistakes never consume lives; memory mismatch closes at three misses
+  ---
+  duration_ms: 1.014684
+  type: 'test'
+  ...
+# Subtest: Rule Shift samples uniquely distinguish its five documented rules across 500 seeds
+ok 61 - Rule Shift samples uniquely distinguish its five documented rules across 500 seeds
+  ---
+  duration_ms: 17.543478
+  type: 'test'
+  ...
+# Subtest: Dots boxes has four exact edges per box and completion grants an extra turn
+ok 62 - Dots boxes has four exact edges per box and completion grants an extra turn
+  ---
+  duration_ms: 0.668135
+  type: 'test'
+  ...
+# Subtest: Reversi brackets/flips, legal-move requirement and mandatory pass are enforced
+ok 63 - Reversi brackets/flips, legal-move requirement and mandatory pass are enforced
+  ---
+  duration_ms: 0.357057
+  type: 'test'
+  ...
+# Subtest: Mancala captures opposite stones, skips the opponent store and preserves 48 stones
+ok 64 - Mancala captures opposite stones, skips the opponent store and preserves 48 stones
+  ---
+  duration_ms: 0.183154
+  type: 'test'
+  ...
+# Subtest: Twenty One soft aces; Sevens blocked passes; Golf matching columns cancel
+ok 65 - Twenty One soft aces; Sevens blocked passes; Golf matching columns cancel
+  ---
+  duration_ms: 2.051322
+  type: 'test'
+  ...
+# Subtest: Bounded generators keep high levels small and seeded rounds deterministic
+ok 66 - Bounded generators keep high levels small and seeded rounds deterministic
+  ---
+  duration_ms: 3.766966
+  type: 'test'
+  ...
+# Subtest: War reveals the first card immediately on every battle at levels 1 and 2
+ok 67 - War reveals the first card immediately on every battle at levels 1 and 2
+  ---
+  duration_ms: 124.24849
+  type: 'test'
+  ...
+# Subtest: War final equal cards: both exhausted is draw; only one exhausted loses
+ok 68 - War final equal cards: both exhausted is draw; only one exhausted loses
+  ---
+  duration_ms: 0.798759
+  type: 'test'
+  ...
+# Subtest: Mental Rotation has four visibly distinct options and grades geometry, including old symmetric states
+ok 69 - Mental Rotation has four visibly distinct options and grades geometry, including old symmetric states
+  ---
+  duration_ms: 34.858863
+  type: 'test'
+  ...
+# Subtest: River Crossing keeps real forbidden food-chain pairs when display order changes
+ok 70 - River Crossing keeps real forbidden food-chain pairs when display order changes
+  ---
+  duration_ms: 1.118444
+  type: 'test'
+  ...
+1..70
+# tests 70
+# suites 0
+# pass 70
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1748.142957
+
+> build
+> next build
+
+▲ Next.js 16.4.1 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 104ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 7.8s
+  Running TypeScript ...
+  Finished TypeScript in 8.6s ...
+  Collecting page data using 1 worker ...
+  Generating static pages using 1 worker (0/26) ...
+  Generating static pages using 1 worker (6/26) 
+  Generating static pages using 1 worker (12/26) 
+  Generating static pages using 1 worker (19/26) 
+✓ Generating static pages using 1 worker (26/26) in 600ms
+  Finalizing page optimization ...
+
+Route (app)
+┌ ƒ /
+├ ○ /_not-found
+├ ○ /account
+├ ○ /admin
+├ ƒ /api/activity
+├ ƒ /api/admin/ads
+├ ƒ /api/admin/users
+├ ƒ /api/auth/login
+├ ƒ /api/auth/me
+├ ƒ /api/auth/register
+├ ƒ /api/cards/rooms
+├ ƒ /api/cards/rooms/[code]
+├ ƒ /api/cards/rooms/[code]/action
+├ ƒ /api/cards/rooms/[code]/join
+├ ƒ /api/cards/rooms/[code]/start
+├ ƒ /api/cron/cleanup
+├ ƒ /api/health
+├ ƒ /api/rooms
+├ ƒ /api/rooms/[code]
+├ ƒ /api/scores
+├ ƒ /games/[game]
+├ ○ /games/2048
+├ ○ /games/codebreaker
+├ ○ /games/connect4
+├ ○ /games/crazy8
+├ ○ /games/crazy8/rules
+├ ○ /games/lights
+├ ○ /games/math
+├ ○ /games/matrix
+├ ○ /games/maze
+├ ○ /games/memory
+├ ○ /games/minesweeper
+├ ○ /games/numbers
+├ ○ /games/odd
+├ ○ /games/pong
+├ ○ /games/scramble
+├ ○ /games/sequence
+├ ○ /games/slide
+├ ○ /games/snake
+├ ○ /games/tictactoe
+├ ○ /games/typing
+├ ƒ /leaderboard
+├ ○ /login
+└ ○ /settings
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+

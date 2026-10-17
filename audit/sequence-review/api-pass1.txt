@@ -1,0 +1,304 @@
+
+> test
+> node --test tests/api.test.mjs
+
+TAP version 13
+# Subtest: health and malformed request handling
+ok 1 - health and malformed request handling
+  ---
+  duration_ms: 247.618186
+  type: 'test'
+  ...
+# Subtest: registration never grants admin and account scores are attributed
+ok 2 - registration never grants admin and account scores are attributed
+  ---
+  duration_ms: 268.503309
+  type: 'test'
+  ...
+# Subtest: generic room capacity, host authorization, reconnect and turn checks
+ok 3 - generic room capacity, host authorization, reconnect and turn checks
+  ---
+  duration_ms: 132.792309
+  type: 'test'
+  ...
+# Subtest: Crazy Eights hides deck and validates host; concurrent draws apply once
+ok 4 - Crazy Eights hides deck and validates host; concurrent draws apply once
+  ---
+  duration_ms: 213.187875
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 926.65472
+
+> test:upgrade
+> node --test tests/upgrade.test.mjs
+
+TAP version 13
+# Subtest: all five generic games retain stale/offline rooms through cron, reconnect, and host transfer
+ok 1 - all five generic games retain stale/offline rooms through cron, reconnect, and host transfer
+  ---
+  duration_ms: 471.782447
+  type: 'test'
+  ...
+# Subtest: playing rooms reserve offline seats; explicit leave rotates token; new host can close
+ok 2 - playing rooms reserve offline seats; explicit leave rotates token; new host can close
+  ---
+  duration_ms: 66.545296
+  type: 'test'
+  ...
+# Subtest: Crazy Eights retains hands through heartbeat/cron, has real leave/close, and transfers host
+ok 3 - Crazy Eights retains hands through heartbeat/cron, has real leave/close, and transfers host
+  ---
+  duration_ms: 63.141256
+  type: 'test'
+  ...
+# Subtest: seven-day inactivity is reversible, idempotent, and never deletes account, scores or open rooms
+ok 4 - seven-day inactivity is reversible, idempotent, and never deletes account, scores or open rooms
+  ---
+  duration_ms: 158.345365
+  type: 'test'
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 4
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 860.753016
+
+> test:access
+> node --test tests/access.test.mjs
+
+TAP version 13
+# Subtest: tictactoe: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 1 - tictactoe: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 810.561577
+  type: 'test'
+  ...
+# Subtest: connect4: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 2 - connect4: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 520.323675
+  type: 'test'
+  ...
+# Subtest: memory: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 3 - memory: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 500.874953
+  type: 'test'
+  ...
+# Subtest: math: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 4 - math: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 483.766467
+  type: 'test'
+  ...
+# Subtest: typing: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 5 - typing: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 456.394211
+  type: 'test'
+  ...
+# Subtest: crazy8: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+ok 6 - crazy8: password + kick permissions, rotated credentials, rejoin and mid-game preservation
+  ---
+  duration_ms: 474.408511
+  type: 'test'
+  ...
+# Subtest: admin: backend authorization, placement persistence, clear account activity/per-game/guest details
+ok 7 - admin: backend authorization, placement persistence, clear account activity/per-game/guest details
+  ---
+  duration_ms: 117.688143
+  type: 'test'
+  ...
+# Subtest: kicking a player who is choosing an eight suit cannot stall Crazy Eights
+ok 8 - kicking a player who is choosing an eight suit cannot stall Crazy Eights
+  ---
+  duration_ms: 44.680077
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3508.408872
+
+> test:multiplayer-api
+> node --test tests/multiplayer-api.mjs
+
+TAP version 13
+# Subtest: memory serializes simultaneous flips, cannot hide the second card early, and rejects state/score forgery
+ok 1 - memory serializes simultaneous flips, cannot hide the second card early, and rejects state/score forgery
+  ---
+  duration_ms: 140.12074
+  type: 'test'
+  ...
+# Subtest: both race games enforce challenge identity, deadline and one accepted concurrent answer
+ok 2 - both race games enforce challenge identity, deadline and one accepted concurrent answer
+  ---
+  duration_ms: 176.021764
+  type: 'test'
+  ...
+# Subtest: board moves enforce symbol, one changed cell, gravity and stale versions
+ok 3 - board moves enforce symbol, one changed cell, gravity and stale versions
+  ---
+  duration_ms: 103.463755
+  type: 'test'
+  ...
+# Subtest: Crazy Eights completes a full human-v-human game with validated hands, draws and wild suits
+ok 4 - Crazy Eights completes a full human-v-human game with validated hands, draws and wild suits
+  ---
+  duration_ms: 397.769142
+  type: 'test'
+  ...
+# Subtest: late arrivals cannot create nonexistent race/memory slots; explicit leave preserves active turn
+ok 5 - late arrivals cannot create nonexistent race/memory slots; explicit leave preserves active turn
+  ---
+  duration_ms: 121.679835
+  type: 'test'
+  ...
+# Subtest: moderating an active host transfers control and revokes old capabilities in both room engines
+ok 6 - moderating an active host transfers control and revokes old capabilities in both room engines
+  ---
+  duration_ms: 335.58477
+  type: 'test'
+  ...
+1..6
+# tests 6
+# suites 0
+# pass 6
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1366.322095
+
+> test:pack-api
+> tsx --test tests/pack-api.test.ts
+
+TAP version 13
+# Subtest: rummy: authenticated private views, legal full round, authoritative finish, rematch
+ok 1 - rummy: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 215.475259
+  type: 'test'
+  ...
+# Subtest: go-fish: authenticated private views, legal full round, authoritative finish, rematch
+ok 2 - go-fish: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 573.335104
+  type: 'test'
+  ...
+# Subtest: war: authenticated private views, legal full round, authoritative finish, rematch
+ok 3 - war: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 3348.576554
+  type: 'test'
+  ...
+# Subtest: twenty-one: authenticated private views, legal full round, authoritative finish, rematch
+ok 4 - twenty-one: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 79.042567
+  type: 'test'
+  ...
+# Subtest: sevens: authenticated private views, legal full round, authoritative finish, rematch
+ok 5 - sevens: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 573.273909
+  type: 'test'
+  ...
+# Subtest: golf-six: authenticated private views, legal full round, authoritative finish, rematch
+ok 6 - golf-six: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 203.014577
+  type: 'test'
+  ...
+# Subtest: old-maid: authenticated private views, legal full round, authoritative finish, rematch
+ok 7 - old-maid: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 103.66935
+  type: 'test'
+  ...
+# Subtest: secret-mission: authenticated private views, legal full round, authoritative finish, rematch
+ok 8 - secret-mission: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 71.38529
+  type: 'test'
+  ...
+# Subtest: nim: authenticated private views, legal full round, authoritative finish, rematch
+ok 9 - nim: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 153.614162
+  type: 'test'
+  ...
+# Subtest: dots-boxes: authenticated private views, legal full round, authoritative finish, rematch
+ok 10 - dots-boxes: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 129.065177
+  type: 'test'
+  ...
+# Subtest: reversi: authenticated private views, legal full round, authoritative finish, rematch
+ok 11 - reversi: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 464.764991
+  type: 'test'
+  ...
+# Subtest: mancala: authenticated private views, legal full round, authoritative finish, rematch
+ok 12 - mancala: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 134.882756
+  type: 'test'
+  ...
+# Subtest: battleship: authenticated private views, legal full round, authoritative finish, rematch
+ok 13 - battleship: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 368.421194
+  type: 'test'
+  ...
+# Subtest: word-duel: authenticated private views, legal full round, authoritative finish, rematch
+ok 14 - word-duel: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 154.671263
+  type: 'test'
+  ...
+# Subtest: poisoned-chocolate: authenticated private views, legal full round, authoritative finish, rematch
+ok 15 - poisoned-chocolate: authenticated private views, legal full round, authoritative finish, rematch
+  ---
+  duration_ms: 121.236417
+  type: 'test'
+  ...
+# Subtest: Ten-player Rummy optional password, no-token privacy, kick/rejoin, host transfer, idle persistence and compaction
+ok 16 - Ten-player Rummy optional password, no-token privacy, kick/rejoin, host transfer, idle persistence and compaction
+  ---
+  duration_ms: 828.258455
+  type: 'test'
+  ...
+# Subtest: Concurrent commands serialize by version; stale/private error responses stay private
+ok 17 - Concurrent commands serialize by version; stale/private error responses stay private
+  ---
+  duration_ms: 62.360961
+  type: 'test'
+  ...
+1..17
+# tests 17
+# suites 0
+# pass 17
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 7935.36533

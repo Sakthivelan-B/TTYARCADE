@@ -1,10 +1,24 @@
 # TTYARCADE — 70-game developer handover
 
-**16 October 2026 · Complete repository expansion · `TTYARCADE-70-games.zip`.**
+**16 October 2026 · Complete repository expansion · `TTYARCADE-70-games-reviewed.zip`.**
 
 **51 NEW games + the existing 19 = 70 games.** The alphabet and numbers garden is ONE game with two modes, not two counted games. This builds on the previous audited code and retains the completed Code Breaker fix. No GitHub push or cloud deployment was performed.
 
 Public upstream was compared again at **`83e5309f09e5aceeec802603579ba3c435e449d0`**. Against the previous delivered tabs ZIP, the only differing upstream source file was the already-fixed Code Breaker page. That logic is retained; only its instruction container is now collapsed. No unrelated upstream features were replaced. See `audit/expansion/UPSTREAM.md`.
+
+## Follow-up: gameplay sequence review
+
+This release corrects the reported **War second-battle visibility bug**. A current reveal now replaces the previous battle immediately, with separate named player slots; the other card remains `??` until that player reveals. Completed-battle and current/last-battle labels distinguish the stages.
+
+Other corrections found during review:
+- War: tied final cards with both piles exhausted produce a draw; only one exhausted pile loses. Exhaustion is checked before moving facedown cards.
+- Same-device play: public boards (War, Golf, Nim and other public strategies) remain visible between turns. Private hands, fleets, mission clues and puzzle relay handoffs retain their privacy curtain.
+- Mental Rotation: every newly generated option is visually distinct. Geometry-based grading also accepts equivalent rotations in older symmetric saved states.
+- River Crossing: shuffling names no longer changes the predator/food relationships.
+
+**Current verification is `audit/sequence-review/REVIEW.md` and its logs.** `audit/expansion/` is the previous release baseline, not evidence for these new corrections. Both complete follow-up passes succeeded: 9 original + 70 expansion unit tests, 39 API scenarios, all 51 new rendered-control paths plus all 19 original browser play paths, two-browser gameplay/privacy, refresh/rematch, tabs, retention and access/admin regressions. The expansion suite now checks intermediate projections after reducer transitions, not only final outcomes. War additionally passed **560 individually checked reveals across two complete local rounds per pass**, plus two-browser first/second/third battles and refresh. Fresh extraction/install/lint/types/units/production build passed with default production headers.
+
+These are representative automated checks, **not a claim that every game was manually played to completion twice or that every possible state is defect-free**. Full generated engine solves and supported seat-count simulations complement browser-path checks; Rummy finishing uses the existing isolated test fixture. No schema changes are needed for this follow-up. All setup and publishing instructions below still apply.
 
 ## 1. What ships and where to start
 
@@ -232,13 +246,13 @@ Netlify requires a compatible Next/OpenNext runtime/adapter, not a static site e
 
 ## 8. Verification, evidence and limitations
 
-Current evidence is **`audit/expansion/`**, not old audit folders. Final production build/runtime used **Node 22.23.3**, PostgreSQL **17**, Chromium/Linux. Earlier development also ran on Node 20.20.2; Node 22 is the supported recommendation. Final checks:
+Current follow-up evidence is **`audit/sequence-review/`**. The original expansion baseline is retained under `audit/expansion/`. Final production build/runtime used **Node 22.23.3**, PostgreSQL **17**, Chromium/Linux. Earlier development also ran on Node 20.20.2; Node 22 is the supported recommendation. Final checks:
 
 | Check | Result / scope |
 |---|---|
 | ESLint, TypeScript, production build | PASS |
 | Original unit suite | 9/9 |
-| New game logic suite | 66/66; seeded generated solves at levels 1/2/8/50/1,000,000, supported card/strategy seat counts, immutable commands, Rummy partitions/decks/recycling, physical-card conservation, alternative constraint solutions, hidden-state projections, rule uniqueness and bounded high-level states |
+| New game logic suite | 70/70; seeded generated solves at levels 1/2/8/50/1,000,000, supported card/strategy seat counts, immutable commands, Rummy partitions/decks/recycling, physical-card conservation, alternative constraint solutions, hidden-state projections, rule uniqueness and bounded high-level states |
 | Baseline API | 4/4 |
 | New online API | 17/17: every one of 15 new online games finishes and rematches, plus 10-seat password/kick/rejoin/host transfer/compaction, idle retention, concurrent/stale moves and privacy/error checks |
 | Original expanded multiplayer API | 6/6, including full Crazy Eights and 104-card accounting |
@@ -254,7 +268,7 @@ Current evidence is **`audit/expansion/`**, not old audit folders. Final product
 | Code Breaker regression | All 15,625 level-one score pairs, both screenshot histories (including unique 243), fixed secret/history, repeats/leading zeros, duplicate submissions, loss/retry; PASS |
 | Database | Fresh `schema.sql` bootstrap and repeat additive retention/version/access migrations PASS. No schema files changed from compared upstream. |
 | Ads | Default-off/no unconsented request/no game-page slots rechecked. Live/placeholder bridge logic retained; no real publisher approval or ad serving claimed. |
-| Clean extraction | ZIP extracted without private env/dependencies/build output; Node 22 `npm ci`, lint, types, 9 original units, 66 expansion units and production build PASS. All source/config bytes matched the delivery candidate. |
+| Clean extraction | ZIP extracted without private env/dependencies/build output; Node 22 `npm ci`, lint, types, 9 original units, 70 expansion units and production build PASS. All source/config bytes matched the delivery candidate. |
 | Dependency audit | Production: 0 vulnerabilities. Full development tree: 5 high ESLint-chain advisories; no forced dependency downgrade. |
 
 Rummy API finishing uses a legal-hand fixture installed directly into the isolated test DB, then the real declaration endpoint; there is no application debug/backdoor endpoint. Other complete-round simulations use legal commands. Browser checks are representative input/progression checks, NOT exhaustive completion of every random level. Tests do not prove universal correctness.
@@ -278,6 +292,7 @@ npm run test:browser
 npm run test:all-games-browser
 npm run test:pack-browser
 npm run test:pack-online-browser
+npm run test:war-browser
 npm run test:codebreaker
 npm run test:multiplayer-browser
 npm run test:retention-browser

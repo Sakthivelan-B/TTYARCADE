@@ -47,6 +47,7 @@ npm run test:browser
 npm run test:all-games-browser
 npm run test:pack-browser
 npm run test:pack-online-browser
+npm run test:war-browser
 npm run test:multiplayer-browser
 npm run test:retention-browser
 npm run test:tabs-browser
@@ -59,10 +60,14 @@ npm run test:access-browser
 npm audit --omit=dev
 ```
 
-Regenerate the full game guide with `npm run docs:games`. Current evidence: `audit/expansion/`.
+Regenerate the full game guide with `npm run docs:games`. Current evidence: `audit/sequence-review/REVIEW.md`; previous expansion baseline: `audit/expansion/`.
 
 ## Delivery / limits
 
 Final repository: **TTYARCADE-70-games.zip**, not any earlier release ZIP. Compared against upstream `83e5309f09e5aceeec802603579ba3c435e449d0`; no push or cloud deployment performed. ZIP excludes secrets, `.git`, dependencies, generated output, test database contents and historical duplicate audit folders.
 
 Ordinary solo scores remain client-submitted, not anti-cheat attestations. Polling is not a zero-lag guarantee. Fixed-size boards and finite curated banks mean repeat patterns/content are possible. No IQ/health benefit, mathematical infinity, real gamepad/mobile hardware certification or exhaustive load/soak testing is claimed. Runtime dependency audit is clean at the recorded snapshot; five high development-only ESLint-chain advisories remain. Live external ads can contain color; default-off/placeholder preserves strict monochrome.
+
+### Gameplay sequence corrections
+
+This reviewed release fixes stale War cards after the first battle, simultaneous War exhaustion, ambiguous Mental Rotation choices, and randomized River Crossing food chains. Public same-device boards no longer disappear behind private-turn curtains. All 70 browser play paths and the logic/API suites were rerun twice; see the current review for exact coverage and limitations.

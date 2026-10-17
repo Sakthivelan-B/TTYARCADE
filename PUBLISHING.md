@@ -23,7 +23,7 @@ rsync -av --exclude='.git' --exclude='.env' --exclude='.env.local' \
   ../ttyarcade-release/TTYARCADE/ ./
 ```
 
-An overlay does not delete obsolete files. After making an external backup, remove old **audit reports only** so they do not look like current verification, then copy `audit/expansion/` from the ZIP. Do not delete source/tests/SQL migrations. Remove obsolete `drizzle.config.json` if present; the supported config is `drizzle.config.ts`. On Windows copy hidden `.gitignore`, `.env.example` and `.nvmrc` too, without replacing `.git` or private `.env*` files. No patch or intermediate ZIP needs applying first.
+An overlay does not delete obsolete files. After making an external backup, remove old **audit reports only** so they do not look like current verification, then copy the packaged `audit/` folder. Current follow-up results are in `audit/sequence-review/`; `audit/expansion/` is the retained previous-release baseline. Do not delete source/tests/SQL migrations. Remove obsolete `drizzle.config.json` if present; the supported config is `drizzle.config.ts`. On Windows copy hidden `.gitignore`, `.env.example` and `.nvmrc` too, without replacing `.git` or private `.env*` files. No patch or intermediate ZIP needs applying first.
 
 ## 2. Database first
 
@@ -60,6 +60,7 @@ npm run test:browser
 npm run test:all-games-browser
 npm run test:pack-browser
 npm run test:pack-online-browser
+npm run test:war-browser
 npm run test:multiplayer-browser
 npm run test:retention-browser
 npm run test:tabs-browser
